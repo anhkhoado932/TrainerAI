@@ -50,9 +50,9 @@ export function DashboardContent({ hasAssessment, hasWorkoutPlan }: DashboardCon
             </p>
           </div>
 
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            <Card className={`relative bg-card/50 backdrop-blur-sm border-transparent hover:border-transparent transition-colors group/card ${hasAssessment ? 'opacity-50' : ''}`}>
-              <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-indigo-500 via-purple-500 via-pink-500 via-red-500 via-yellow-500 via-green-500 to-blue-500 animate-gradient-x opacity-75 blur group-hover/card:opacity-100 transition-opacity duration-500" />
+          <div className="grid gap-4 grid-cols-3">
+            <Card className="relative overflow-hidden bg-card/50 backdrop-blur-sm border-transparent hover:border-transparent transition-colors group/card h-[300px]">
+              <div className="absolute inset-0 rounded-lg bg-[conic-gradient(at_top,_var(--tw-gradient-stops))] from-red-500 via-purple-500 via-blue-500 via-green-500 to-yellow-500 opacity-[0.15] group-hover/card:opacity-[0.25] transition-opacity duration-500" />
               <div className="absolute inset-[1px] rounded-lg bg-card/90 backdrop-blur-xl" />
               <div className="relative">
                 <CardHeader>
@@ -70,26 +70,25 @@ export function DashboardContent({ hasAssessment, hasWorkoutPlan }: DashboardCon
                 <CardContent>
                   <Button 
                     size="lg" 
-                    className="relative w-full group bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-lg hover:shadow-blue-500/25 transition-all duration-300" 
+                    className="relative w-full group bg-[conic-gradient(at_top,_var(--tw-gradient-stops))] from-red-500 via-purple-500 via-blue-500 via-green-500 to-yellow-500 hover:from-red-400 hover:via-purple-400 hover:via-blue-400 hover:via-green-400 hover:to-yellow-400 shadow-lg hover:shadow-purple-500/25 transition-all duration-300" 
                     asChild
                   >
                     <Link 
                       href="/assessment" 
-                      className="relative flex items-center justify-center gap-2 py-8 text-lg font-medium"
+                      className="relative flex items-center justify-center gap-2 py-4 text-base font-medium"
                     >
                       <span className="text-white font-semibold">
                         {hasAssessment ? "View Results" : "Start Assessment"}
                       </span>
                       <Icons.arrowRight className="h-5 w-5 text-white group-hover:translate-x-1 transition-transform duration-300 ease-out" />
-                      <div className="absolute inset-0 rounded-md bg-gradient-to-r from-blue-400/20 to-indigo-400/20 blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     </Link>
                   </Button>
                 </CardContent>
               </div>
             </Card>
 
-            <Card className={`relative bg-card/50 backdrop-blur-sm border-transparent hover:border-transparent transition-colors group/card ${!hasWorkoutPlan ? 'opacity-50' : ''}`}>
-              <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-indigo-500 via-purple-500 via-pink-500 via-red-500 via-yellow-500 via-green-500 to-blue-500 animate-gradient-x opacity-75 blur group-hover/card:opacity-100 transition-opacity duration-500" />
+            <Card className="relative overflow-hidden bg-card/50 backdrop-blur-sm border-transparent hover:border-transparent transition-colors group/card h-[300px]">
+              <div className="absolute inset-0 rounded-lg bg-[conic-gradient(at_top,_var(--tw-gradient-stops))] from-red-500 via-purple-500 via-blue-500 via-green-500 to-yellow-500 opacity-[0.15] group-hover/card:opacity-[0.25] transition-opacity duration-500" />
               <div className="absolute inset-[1px] rounded-lg bg-card/90 backdrop-blur-xl" />
               <div className="relative">
                 <CardHeader>
@@ -107,44 +106,52 @@ export function DashboardContent({ hasAssessment, hasWorkoutPlan }: DashboardCon
                 <CardContent>
                   <Button 
                     size="lg" 
-                    className="relative w-full group bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-lg hover:shadow-blue-500/25 transition-all duration-300" 
+                    className="relative w-full group bg-[conic-gradient(at_top,_var(--tw-gradient-stops))] from-red-500 via-purple-500 via-blue-500 via-green-500 to-yellow-500 hover:from-red-400 hover:via-purple-400 hover:via-blue-400 hover:via-green-400 hover:to-yellow-400 shadow-lg hover:shadow-purple-500/25 transition-all duration-300" 
                     asChild={hasWorkoutPlan}
                     disabled={!hasWorkoutPlan}
                   >
                     {hasWorkoutPlan ? (
                       <Link 
                         href="/workout" 
-                        className="relative flex items-center justify-center gap-2 py-8 text-lg font-medium"
+                        className="relative flex items-center justify-center gap-2 py-4 text-base font-medium"
                       >
                         <span className="text-white font-semibold">
                           View Workout Plan
                         </span>
                         <Icons.arrowRight className="h-5 w-5 text-white group-hover:translate-x-1 transition-transform duration-300 ease-out" />
-                        <div className="absolute inset-0 rounded-md bg-gradient-to-r from-blue-400/20 to-indigo-400/20 blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       </Link>
                     ) : (
-                      <span className="py-8 text-lg font-medium">Complete Assessment First</span>
+                      <span className="py-4 text-base text-muted-foreground font-medium">Complete Assessment First</span>
                     )}
                   </Button>
                 </CardContent>
               </div>
             </Card>
 
-            <Card className="bg-card/50 backdrop-blur-sm border-primary/20">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Icons.chart className="h-5 w-5 text-primary" />
-                  Progress
-                </CardTitle>
-                <CardDescription>
-                  Track your fitness journey progress
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button size="lg" variant="secondary" className="w-full" disabled>
-                  Coming Soon
-                </Button>
-              </CardContent>
+            <Card className="relative overflow-hidden bg-card/50 backdrop-blur-sm border-transparent hover:border-transparent transition-colors group/card h-[300px]">
+              <div className="absolute inset-0 rounded-lg bg-[conic-gradient(at_top,_var(--tw-gradient-stops))] from-red-500 via-purple-500 via-blue-500 via-green-500 to-yellow-500 opacity-[0.15] group-hover/card:opacity-[0.25] transition-opacity duration-500" />
+              <div className="absolute inset-[1px] rounded-lg bg-card/90 backdrop-blur-xl" />
+              <div className="relative">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Icons.chart className="h-5 w-5 text-primary" />
+                    Progress
+                  </CardTitle>
+                  <CardDescription>
+                    Track your fitness journey progress
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    size="lg" 
+                    className="w-full py-4 text-base font-medium" 
+                    variant="secondary" 
+                    disabled
+                  >
+                    Coming Soon
+                  </Button>
+                </CardContent>
+              </div>
             </Card>
           </div>
 
