@@ -9,23 +9,25 @@ import { Icons } from "@/components/ui/icons"
 
 export default function DashboardPage() {
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-b from-background to-background/80">
-      <header className="border-b border-border/40 backdrop-blur-sm sticky top-0 z-50">
+    <div className="flex flex-col min-h-screen bg-white">
+      <header className="border-b border-gray-200 bg-white sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="font-bold text-xl text-foreground flex items-center gap-2">
-            <Icons.logo className="h-6 w-6 text-primary" />
-            AI PT
+          <div className="font-bold text-xl text-black flex items-center gap-2">
+            <Icons.logo className="h-6 w-6 text-[#F26430]" />
+            PT<span className="text-[#F26430]">+</span>
           </div>
           <nav className="flex items-center space-x-4">
             <Link 
               href="/" 
-              className="text-muted-foreground hover:text-foreground transition-colors"
+              className="text-gray-600 hover:text-[#F26430] transition-colors"
             >
               Home
             </Link>
             <SignOutButton variant="ghost" />
-            <Avatar>
-              <AvatarFallback>A</AvatarFallback>
+            <Avatar className="h-10 w-10">
+              <AvatarFallback className="bg-[#F26430] text-white text-lg">
+                A
+              </AvatarFallback>
             </Avatar>
           </nav>
         </div>
@@ -34,109 +36,94 @@ export default function DashboardPage() {
       <main className="flex-1 container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto space-y-12">
           <div className="text-center space-y-4">
-            <h1 className="text-4xl font-bold text-foreground sm:text-5xl">
+            <h1 className="text-4xl font-bold text-black sm:text-5xl">
               Welcome to Your Fitness Journey
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Let's create your personalized fitness plan with our AI-powered assessment
             </p>
           </div>
 
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            <Card className="relative bg-card/50 backdrop-blur-sm border-transparent hover:border-transparent transition-colors group/card">
-              <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-indigo-500 via-purple-500 via-pink-500 via-red-500 via-yellow-500 via-green-500 to-blue-500 animate-gradient-x opacity-75 blur group-hover/card:opacity-100 transition-opacity duration-500" />
-              <div className="absolute inset-[1px] rounded-lg bg-card/90 backdrop-blur-xl" />
-              <div className="relative">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Icons.fileText className="h-5 w-5 text-primary" />
-                    Assessment
-                  </CardTitle>
-                  <CardDescription>
-                    Complete a quick assessment to get started
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button 
-                    size="lg" 
-                    className="relative w-full group bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-lg hover:shadow-blue-500/25 transition-all duration-300" 
-                    asChild
+            <Card className="relative bg-white border-gray-200 hover:shadow-lg hover:shadow-[#F26430]/10 transition-all duration-300">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-black">
+                  <Icons.fileText className="h-5 w-5 text-[#F26430]" />
+                  Assessment
+                </CardTitle>
+                <CardDescription className="text-gray-600">
+                  Complete a quick assessment to get started
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button 
+                  size="lg" 
+                  className="w-full bg-[#F26430] hover:bg-[#F26430]/90 text-white py-6 text-lg font-medium rounded-xl hover:scale-105 transition-all duration-300" 
+                  asChild
+                >
+                  <Link 
+                    href="/assessment" 
+                    className="flex items-center justify-center gap-2"
                   >
-                    <Link 
-                      href="/assessment" 
-                      className="relative flex items-center justify-center gap-2 py-6 text-lg font-medium"
-                    >
-                      <span className="text-white font-semibold">
-                        Start Assessment
-                      </span>
-                      <Icons.arrowRight className="h-5 w-5 text-white group-hover:translate-x-1 transition-transform duration-300 ease-out" />
-                      <div className="absolute inset-0 rounded-md bg-gradient-to-r from-blue-400/20 to-indigo-400/20 blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    </Link>
-                  </Button>
-                </CardContent>
-              </div>
+                    <span>Start Assessment</span>
+                    <Icons.arrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                </Button>
+              </CardContent>
             </Card>
 
-            <Card className="bg-card/50 backdrop-blur-sm border-primary/20">
+            <Card className="bg-white border-gray-200 hover:shadow-lg hover:shadow-[#F26430]/10 transition-all duration-300">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Icons.more className="h-5 w-5 text-primary" />
+                <CardTitle className="flex items-center gap-2 text-black">
+                  <Icons.more className="h-5 w-5 text-[#F26430]" />
                   Workouts
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-gray-600">
                   View your personalized workout plans
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button size="lg" variant="secondary" className="w-full" disabled>
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="w-full border-2 border-gray-200 text-gray-600 hover:border-[#F26430]/30 hover:text-[#F26430]" 
+                  disabled
+                >
                   Coming Soon
                 </Button>
               </CardContent>
             </Card>
 
-            <Card className="bg-card/50 backdrop-blur-sm border-primary/20">
+            <Card className="bg-white border-gray-200 hover:shadow-lg hover:shadow-[#F26430]/10 transition-all duration-300">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Icons.chart className="h-5 w-5 text-primary" />
+                <CardTitle className="flex items-center gap-2 text-black">
+                  <Icons.chart className="h-5 w-5 text-[#F26430]" />
                   Progress
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-gray-600">
                   Track your fitness journey progress
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button size="lg" variant="secondary" className="w-full" disabled>
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="w-full border-2 border-gray-200 text-gray-600 hover:border-[#F26430]/30 hover:text-[#F26430]" 
+                  disabled
+                >
                   Coming Soon
                 </Button>
               </CardContent>
             </Card>
           </div>
 
-          <div className="bg-primary/5 border border-primary/10 rounded-lg p-6 text-center">
-            <p className="text-sm text-muted-foreground">
+          <div className="bg-[#F26430]/5 border border-[#F26430]/10 rounded-lg p-6 text-center">
+            <p className="text-sm text-gray-600">
               Complete your assessment to unlock personalized workout plans and progress tracking
             </p>
           </div>
         </div>
       </main>
-
-      <style jsx global>{`
-        @keyframes gradient-x {
-          0% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
-          100% {
-            background-position: 0% 50%;
-          }
-        }
-        .animate-gradient-x {
-          animation: gradient-x 15s ease infinite;
-          background-size: 400% 400%;
-        }
-      `}</style>
     </div>
   )
 } 

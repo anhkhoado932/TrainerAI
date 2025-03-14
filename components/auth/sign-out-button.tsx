@@ -34,7 +34,7 @@ export function SignOutButton({ variant = 'default' }: SignOutButtonProps) {
       variant={variant}
       onClick={handleSignOut}
       disabled={isLoading}
-      className="text-gray-600 hover:text-black transition-colors"
+      className="text-gray-600 hover:text-[#F26430] transition-colors"
     >
       {isLoading ? (
         <>

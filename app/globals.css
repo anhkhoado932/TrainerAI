@@ -16,14 +16,14 @@
     --card-foreground: 0 0% 0%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 0%;
-    --primary: 0 0% 0%;
+    --primary: 14 88% 57%;  /* #F26430 */
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 0%;
+    --secondary: 14 88% 97%;  /* Lighter version of #F26430 */
+    --secondary-foreground: 14 88% 57%;
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 40%;
-    --accent: 0 0% 96%;
-    --accent-foreground: 0 0% 0%;
+    --accent: 14 88% 57%;  /* #F26430 */
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
     --border: 0 0% 0%;
