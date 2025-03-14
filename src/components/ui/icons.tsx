@@ -6,6 +6,7 @@ import {
   ChevronRight, 
   Command, 
   CreditCard, 
+  Dumbbell,
   File, 
   FileText, 
   Github, 
@@ -53,6 +54,7 @@ export const Icons = {
   fileText: FileText,
   chart: LineChart,
   logout: LogOut,
+  dumbbell: Dumbbell,
   google: ({ ...props }: LucideProps) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
       <path

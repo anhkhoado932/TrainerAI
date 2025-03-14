@@ -1,9 +1,9 @@
+import { WorkoutPlanView } from "@/components/workout/workout-plan-view"
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
-import { DashboardContent } from "@/src/components/dashboard/dashboard-content"
 
-export default async function DashboardPage() {
+export default async function WorkoutPage() {
   const supabase = createServerComponentClient({ cookies })
   
   const { data: { user } } = await supabase.auth.getUser()
@@ -11,12 +11,15 @@ export default async function DashboardPage() {
 
   const { data: userData } = await supabase
     .from('user_data')
-    .select('assessment, workout_plan')
+    .select('workout_plan')
     .eq('user_id_fk', user.id)
     .single()
 
-  const hasAssessment = Boolean(userData?.assessment)
-  const hasWorkoutPlan = Boolean(userData?.workout_plan)
+  if (!userData?.workout_plan) redirect('/assessment')
 
-  return <DashboardContent hasAssessment={hasAssessment} hasWorkoutPlan={hasWorkoutPlan} />
+  return (
+    <div className="container max-w-5xl py-8">
+      <WorkoutPlanView workoutPlan={userData.workout_plan} />
+    </div>
+  )
 } 
