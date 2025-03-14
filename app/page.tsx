@@ -1,41 +1,41 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
 
 export default function HomePage() {
   return (
-    <div className="flex flex-col min-h-screen">
-      <header className="border-b">
+    <div className="flex flex-col min-h-screen bg-black">
+      <header className="border-b border-border">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="font-bold text-xl">UniHack 2025</div>
+          <div className="font-bold text-xl text-foreground">AI PT</div>
           <nav className="space-x-4">
-            <Link 
-              href="/dashboard" 
-              className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition-colors"
-            >
-              Dashboard
+            <Link href="/login" className="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+              Login
             </Link>
           </nav>
         </div>
       </header>
       
       <main className="flex-grow">
-        <section className="py-20 bg-gradient-to-b from-white to-gray-50">
+        <section className="py-20 bg-black">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="text-5xl font-bold mb-6">Welcome to UniHack 2025</h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-10">
-              The premier hackathon platform for university students around the globe.
-              Connect, collaborate, and create amazing projects.
+            <h1 className="text-5xl font-bold mb-6 text-foreground">AI PT</h1>
+            <p className="text-2xl font-medium text-primary mb-6">Your Personal AI Fitness Companion</p>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
+              Personalized workout plans, real-time form correction, and adaptive training - all powered by AI.
             </p>
             <div className="flex justify-center gap-4">
               <Link 
                 href="/dashboard" 
-                className="px-6 py-3 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition-colors font-medium"
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-8 py-3 text-base font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               >
-                Go to Dashboard
+                Get Started
               </Link>
               <a 
                 href="#features" 
-                className="px-6 py-3 rounded-md border border-gray-300 hover:bg-gray-50 transition-colors font-medium"
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-md border border-input bg-black px-8 py-3 text-base font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               >
                 Learn More
               </a>
@@ -43,49 +43,54 @@ export default function HomePage() {
           </div>
         </section>
         
-        <section id="features" className="py-20">
+        <section id="features" className="py-20 bg-black">
           <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-12">Key Features</h2>
+            <h2 className="text-3xl font-bold text-center mb-12 text-foreground">Key Features</h2>
             <div className="grid md:grid-cols-3 gap-8">
               {[
                 {
-                  title: "Team Collaboration",
-                  description: "Find teammates and collaborate seamlessly on your hackathon projects."
+                  title: "Smart Workout Plans",
+                  description: "AI-generated workout plans tailored to your fitness level, goals, and available equipment."
                 },
                 {
-                  title: "Project Showcase",
-                  description: "Showcase your projects to judges and the community with detailed profiles."
+                  title: "Form Analysis",
+                  description: "Real-time feedback on your exercise form to prevent injuries and maximize results."
                 },
                 {
-                  title: "Live Events",
-                  description: "Participate in workshops, mentoring sessions, and networking events."
+                  title: "Progress Tracking",
+                  description: "Detailed analytics and insights to track your fitness journey and celebrate milestones."
                 }
               ].map((feature, index) => (
-                <div key={index} className="p-6 border rounded-lg hover:shadow-md transition-shadow">
-                  <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
-                  <p className="text-gray-600">{feature.description}</p>
-                </div>
+                <Card key={index} className="border-border bg-black hover:shadow-md transition-shadow">
+                  <CardHeader>
+                    <CardTitle>{feature.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription>{feature.description}</CardDescription>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           </div>
         </section>
       </main>
       
-      <footer className="bg-gray-800 text-white py-8">
+      <footer className="bg-black py-8 border-t border-border">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-4 md:mb-0">
-              <div className="font-bold text-xl mb-2">UniHack 2025</div>
-              <p className="text-gray-400">Empowering student innovation</p>
+              <div className="font-bold text-xl mb-2 text-foreground">AI PT</div>
+              <p className="text-muted-foreground">Your Personal AI Fitness Companion</p>
             </div>
             <div className="flex space-x-4">
-              <a href="#" className="hover:text-blue-400 transition-colors">About</a>
-              <a href="#" className="hover:text-blue-400 transition-colors">Contact</a>
-              <a href="#" className="hover:text-blue-400 transition-colors">Privacy</a>
+              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">About</a>
+              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">Contact</a>
+              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">Privacy</a>
             </div>
           </div>
-          <div className="mt-8 pt-8 border-t border-gray-700 text-center text-gray-400">
-            &copy; {new Date().getFullYear()} UniHack. All rights reserved.
+          <Separator className="my-8" />
+          <div className="text-center text-muted-foreground">
+            &copy; {new Date().getFullYear()} AI PT. All rights reserved.
           </div>
         </div>
       </footer>

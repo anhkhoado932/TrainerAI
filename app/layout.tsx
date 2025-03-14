@@ -5,8 +5,8 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'UniHack 2025',
-  description: 'UniHack 2025 Frontend Application',
+  title: 'AI PT',
+  description: 'Your Personal AI Fitness Companion',
 }
 
 export default function RootLayout({
@@ -15,8 +15,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className="h-full">
-      <body className={`${inter.className} min-h-full`}>{children}</body>
+    <html lang="en" className="h-full dark">
+      <body className={`${inter.className} min-h-full bg-black text-gray-100`}>{children}</body>
     </html>
   )
 }
