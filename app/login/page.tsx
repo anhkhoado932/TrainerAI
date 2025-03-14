@@ -3,38 +3,102 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Separator } from "@/components/ui/separator"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../src/components/ui/card"
+import { Input } from "../../src/components/ui/input"
+import { Label } from "../../src/components/ui/label"
+import { Checkbox } from "../../src/components/ui/checkbox"
+import { Separator } from "../../src/components/ui/separator"
+import { Alert, AlertDescription } from "../../src/components/ui/alert"
+import { Button } from "../../src/components/ui/button"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../../src/components/ui/form"
+import { Icons } from "../../src/components/ui/icons"
+
+// Form schema for validation
+const loginSchema = z.object({
+  email: z.string().email({ message: 'Please enter a valid email address' }),
+  password: z.string().min(8, { message: 'Password must be at least 8 characters' }),
+  rememberMe: z.boolean().optional(),
+})
+
+type LoginFormValues = z.infer<typeof loginSchema>
+
+// Default values for the form
+const defaultValues: Partial<LoginFormValues> = {
+  email: '',
+  password: '',
+  rememberMe: false,
+}
+
+interface AuthError {
+  message: string;
+  field?: string;
+}
 
 export default function LoginPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState('')
-  
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const [authError, setAuthError] = useState<AuthError | null>(null)
+
+  // Initialize form with react-hook-form and zod validation
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues,
+  })
+
+  async function onSubmit(data: LoginFormValues) {
     setIsLoading(true)
-    setError('')
-    
-    const formData = new FormData(e.currentTarget)
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
+    setAuthError(null)
     
     try {
       // In a real app, you would call your authentication API here
-      console.log('Login attempt with:', { email, password })
+      console.log('Login attempt with:', { email: data.email, password: data.password })
       
       // Simulate successful login
-      setTimeout(() => {
-        // Redirect to dashboard after successful login
-        router.push('/dashboard')
-      }, 1000)
-    } catch (err) {
-      setError('Invalid email or password')
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      // Redirect to dashboard after successful login
+      router.push('/dashboard')
+    } catch (error) {
+      // Handle different types of errors
+      if (error instanceof Error) {
+        setAuthError({ message: error.message })
+      } else {
+        setAuthError({ message: 'An unexpected error occurred. Please try again.' })
+      }
+      setIsLoading(false)
+    }
+  }
+  
+  // Social login handlers
+  const handleGoogleLogin = async () => {
+    setIsLoading(true)
+    setAuthError(null)
+    
+    try {
+      // Implement Google OAuth login
+      console.log('Google login initiated')
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      router.push('/dashboard')
+    } catch (error) {
+      setAuthError({ message: 'Failed to login with Google. Please try again.' })
+      setIsLoading(false)
+    }
+  }
+  
+  const handleGitHubLogin = async () => {
+    setIsLoading(true)
+    setAuthError(null)
+    
+    try {
+      // Implement GitHub OAuth login
+      console.log('GitHub login initiated')
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      router.push('/dashboard')
+    } catch (error) {
+      setAuthError({ message: 'Failed to login with GitHub. Please try again.' })
       setIsLoading(false)
     }
   }
@@ -52,60 +116,102 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
         
-        {error && (
+        {authError && (
           <CardContent>
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
+            <Alert variant="destructive" className="animate-in fade-in-50">
+              <AlertDescription>{authError.message}</AlertDescription>
             </Alert>
           </CardContent>
         )}
         
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email address</Label>
-              <Input
-                id="email"
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
                 name="email"
-                type="email"
-                autoComplete="email"
-                required
-                placeholder="you@example.com"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email address</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="email"
+                        autoComplete="email"
+                        placeholder="you@example.com"
+                        disabled={isLoading}
+                        aria-describedby="email-error"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-                <Link href="#" className="text-sm text-primary hover:underline">
-                  Forgot password?
-                </Link>
-              </div>
-              <Input
-                id="password"
+              
+              <FormField
+                control={form.control}
                 name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                placeholder="••••••••"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>Password</FormLabel>
+                      <Link href="/forgot-password" className="text-sm text-primary hover:underline">
+                        Forgot password?
+                      </Link>
+                    </div>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="password"
+                        autoComplete="current-password"
+                        placeholder="••••••••"
+                        disabled={isLoading}
+                        aria-describedby="password-error"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <div className="flex items-center space-x-2">
-              <Checkbox id="remember-me" name="remember-me" />
-              <Label htmlFor="remember-me" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                Remember me
-              </Label>
-            </div>
+              <FormField
+                control={form.control}
+                name="rememberMe"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-2 space-y-0">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        disabled={isLoading}
+                        id="remember-me"
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel htmlFor="remember-me" className="text-sm font-medium leading-none cursor-pointer">
+                        Remember me
+                      </FormLabel>
+                    </div>
+                  </FormItem>
+                )}
+              />
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50"
-            >
-              {isLoading ? 'Signing in...' : 'Sign in'}
-            </button>
-          </form>
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                    Signing in...
+                  </>
+                ) : (
+                  'Sign in'
+                )}
+              </Button>
+            </form>
+          </Form>
         </CardContent>
         
         <CardFooter className="flex flex-col">
@@ -119,30 +225,33 @@ export default function LoginPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-3 w-full">
-            <button
+            <Button
+              variant="outline"
               type="button"
-              className="inline-flex items-center justify-center whitespace-nowrap rounded-md border border-input bg-background px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              disabled={isLoading}
+              onClick={handleGoogleLogin}
+              className="flex items-center justify-center gap-2"
             >
-              <svg className="h-5 w-5 mr-2" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z" />
-              </svg>
+              <Icons.google className="h-4 w-4" />
               Google
-            </button>
+            </Button>
 
-            <button
+            <Button
+              variant="outline"
               type="button"
-              className="inline-flex items-center justify-center whitespace-nowrap rounded-md border border-input bg-background px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              disabled={isLoading}
+              onClick={handleGitHubLogin}
+              className="flex items-center justify-center gap-2"
             >
-              <svg className="h-5 w-5 mr-2" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24">
-                <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
-              </svg>
+              <Icons.gitHub className="h-4 w-4" />
               GitHub
-            </button>
+            </Button>
           </div>
           
           <div className="mt-6 text-center">
-            <Link href="/" className="text-sm text-primary hover:underline">
-              ← Back to home
+            <Link href="/" className="text-sm text-primary hover:underline inline-flex items-center">
+              <Icons.arrowLeft className="mr-1 h-4 w-4" />
+              Back to home
             </Link>
           </div>
         </CardFooter>
