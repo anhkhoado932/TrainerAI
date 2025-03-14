@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator"
 import { Progress } from "@/components/ui/progress"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { SignOutButton } from "@/components/auth/sign-out-button"
 
 export default function DashboardPage() {
   return (
@@ -20,12 +21,7 @@ export default function DashboardPage() {
             >
               Home
             </Link>
-            <Link 
-              href="/logout" 
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Logout
-            </Link>
+            <SignOutButton variant="ghost" />
             <Avatar>
               <AvatarFallback>A</AvatarFallback>
             </Avatar>

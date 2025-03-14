@@ -2,15 +2,15 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../src/components/ui/card"
 import { Input } from "../../src/components/ui/input"
 import { Label } from "../../src/components/ui/label"
 import { Checkbox } from "../../src/components/ui/checkbox"
-import { Separator } from "../../src/components/ui/separator"
 import { Alert, AlertDescription } from "../../src/components/ui/alert"
 import { Button } from "../../src/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../../src/components/ui/form"
@@ -39,8 +39,10 @@ interface AuthError {
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [isLoading, setIsLoading] = useState(false)
   const [authError, setAuthError] = useState<AuthError | null>(null)
+  const supabase = createClientComponentClient()
 
   // Initialize form with react-hook-form and zod validation
   const form = useForm<LoginFormValues>({
@@ -53,16 +55,20 @@ export default function LoginPage() {
     setAuthError(null)
     
     try {
-      // In a real app, you would call your authentication API here
-      console.log('Login attempt with:', { email: data.email, password: data.password })
+      const { error } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      })
       
-      // Simulate successful login
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // Redirect to dashboard after successful login
-      router.push('/dashboard')
+      if (error) {
+        throw error
+      }
+
+      router.refresh()
+      // Check if there's a redirectTo parameter and use it, otherwise go to dashboard
+      const redirectTo = searchParams.get('redirectTo') || '/dashboard'
+      router.push(redirectTo)
     } catch (error) {
-      // Handle different types of errors
       if (error instanceof Error) {
         setAuthError({ message: error.message })
       } else {
@@ -72,41 +78,10 @@ export default function LoginPage() {
     }
   }
   
-  // Social login handlers
-  const handleGoogleLogin = async () => {
-    setIsLoading(true)
-    setAuthError(null)
-    
-    try {
-      // Implement Google OAuth login
-      console.log('Google login initiated')
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      router.push('/dashboard')
-    } catch (error) {
-      setAuthError({ message: 'Failed to login with Google. Please try again.' })
-      setIsLoading(false)
-    }
-  }
-  
-  const handleGitHubLogin = async () => {
-    setIsLoading(true)
-    setAuthError(null)
-    
-    try {
-      // Implement GitHub OAuth login
-      console.log('GitHub login initiated')
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      router.push('/dashboard')
-    } catch (error) {
-      setAuthError({ message: 'Failed to login with GitHub. Please try again.' })
-      setIsLoading(false)
-    }
-  }
-  
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
+        <CardHeader className="space-y-3 pb-6">
           <CardTitle className="text-2xl font-bold text-center">Sign in to your account</CardTitle>
           <CardDescription className="text-center">
             Or{' '}
@@ -118,21 +93,24 @@ export default function LoginPage() {
         
         {authError && (
           <CardContent>
-            <Alert variant="destructive" className="animate-in fade-in-50">
-              <AlertDescription>{authError.message}</AlertDescription>
+            <Alert variant="destructive" className="animate-in fade-in-50 border-2 border-destructive">
+              <AlertDescription className="font-semibold text-base flex items-center">
+                <Icons.warning className="h-5 w-5 mr-2" />
+                {authError.message}
+              </AlertDescription>
             </Alert>
           </CardContent>
         )}
         
-        <CardContent>
+        <CardContent className="pb-6">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
                 control={form.control}
                 name="email"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email address</FormLabel>
+                  <FormItem className="w-full space-y-2">
+                    <FormLabel className="text-base">Email address</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -141,6 +119,7 @@ export default function LoginPage() {
                         placeholder="you@example.com"
                         disabled={isLoading}
                         aria-describedby="email-error"
+                        className="text-black w-full h-11"
                       />
                     </FormControl>
                     <FormMessage />
@@ -152,9 +131,9 @@ export default function LoginPage() {
                 control={form.control}
                 name="password"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="w-full space-y-2">
                     <div className="flex items-center justify-between">
-                      <FormLabel>Password</FormLabel>
+                      <FormLabel className="text-base">Password</FormLabel>
                       <Link href="/forgot-password" className="text-sm text-primary hover:underline">
                         Forgot password?
                       </Link>
@@ -167,6 +146,7 @@ export default function LoginPage() {
                         placeholder="••••••••"
                         disabled={isLoading}
                         aria-describedby="password-error"
+                        className="text-black w-full h-11"
                       />
                     </FormControl>
                     <FormMessage />
@@ -215,39 +195,6 @@ export default function LoginPage() {
         </CardContent>
         
         <CardFooter className="flex flex-col">
-          <div className="relative my-4 w-full">
-            <div className="absolute inset-0 flex items-center">
-              <Separator className="w-full" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 w-full">
-            <Button
-              variant="outline"
-              type="button"
-              disabled={isLoading}
-              onClick={handleGoogleLogin}
-              className="flex items-center justify-center gap-2"
-            >
-              <Icons.google className="h-4 w-4" />
-              Google
-            </Button>
-
-            <Button
-              variant="outline"
-              type="button"
-              disabled={isLoading}
-              onClick={handleGitHubLogin}
-              className="flex items-center justify-center gap-2"
-            >
-              <Icons.gitHub className="h-4 w-4" />
-              GitHub
-            </Button>
-          </div>
-          
           <div className="mt-6 text-center">
             <Link href="/" className="text-sm text-primary hover:underline inline-flex items-center">
               <Icons.arrowLeft className="mr-1 h-4 w-4" />
