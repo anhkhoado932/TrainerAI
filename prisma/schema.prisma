@@ -1,0 +1,20 @@
+model Assessment {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  primaryGoal   String
+  gender        String
+  age           String
+  fitnessLevel  String
+  trainingAccess String
+  frequency     String
+  diet          String
+  workoutPlan   WorkoutPlan?
+}
+
+model WorkoutPlan {
+  id           String     @id @default(cuid())
+  createdAt    DateTime   @default(now())
+  assessment   Assessment @relation(fields: [assessmentId], references: [id])
+  assessmentId String     @unique
+  plan         String     @db.Text
+} 
