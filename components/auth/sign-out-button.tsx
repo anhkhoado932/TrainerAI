@@ -34,11 +34,12 @@ export function SignOutButton({ variant = 'default' }: SignOutButtonProps) {
       variant={variant}
       onClick={handleSignOut}
       disabled={isLoading}
+      className="text-gray-600 hover:text-black transition-colors"
     >
       {isLoading ? (
         <>
-          <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-          Signing out...
+          <Icons.spinner className="mr-2 h-4 w-4 animate-spin text-gray-600" />
+          <span className="text-gray-600">Signing out...</span>
         </>
       ) : (
         'Sign out'
