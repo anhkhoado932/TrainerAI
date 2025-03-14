@@ -1,5 +1,6 @@
 import { 
   ArrowLeft, 
+  ArrowRight, 
   Check, 
   ChevronLeft, 
   ChevronRight, 
@@ -11,6 +12,7 @@ import {
   Loader2, 
   LogOut, 
   LucideProps, 
+  LineChart, 
   Moon, 
   MoreVertical, 
   Pizza, 
@@ -38,6 +40,7 @@ export const Icons = {
   add: Plus,
   warning: Command,
   arrowLeft: ArrowLeft,
+  arrowRight: ArrowRight,
   sun: SunMedium,
   moon: Moon,
   gitHub: Github,
@@ -48,6 +51,7 @@ export const Icons = {
   creditCard: CreditCard,
   file: File,
   fileText: FileText,
+  chart: LineChart,
   logout: LogOut,
   google: ({ ...props }: LucideProps) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>

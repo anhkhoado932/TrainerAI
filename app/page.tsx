@@ -1,19 +1,46 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { SignOutButton } from "@/components/auth/sign-out-button"
 
-export default function HomePage() {
+export default async function HomePage() {
+  const supabase = createServerComponentClient({ cookies })
+  const { data: { session } } = await supabase.auth.getSession()
+
   return (
     <div className="flex flex-col min-h-screen bg-black">
       <header className="border-b border-border">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="font-bold text-xl text-foreground">AI PT</div>
-          <nav className="space-x-4">
-            <Link href="/login" className="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
-              Login
-            </Link>
+          <nav className="flex items-center space-x-4">
+            {session ? (
+              <>
+                <Link 
+                  href="/dashboard" 
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Dashboard
+                </Link>
+                <SignOutButton variant="ghost" />
+                <Avatar>
+                  <AvatarFallback>
+                    {session.user.email?.[0].toUpperCase() || 'U'}
+                  </AvatarFallback>
+                </Avatar>
+              </>
+            ) : (
+              <Link 
+                href="/login" 
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              >
+                Login
+              </Link>
+            )}
           </nav>
         </div>
       </header>
