@@ -177,13 +177,22 @@ export default function ResultsPage({ params }: ResultsPageProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="p-4 rounded-lg border">
               <h4 className="font-medium mb-1">Knee Angle</h4>
-              <p className="text-2xl font-bold">{analysisData?.min_knee_angle}°</p>
+              <p className="text-2xl font-bold">{parseFloat(analysisData?.min_knee_angle).toFixed(2)}°</p>
               <p className="text-sm text-muted-foreground mt-1">Minimum angle detected during exercise</p>
             </div>
             
             <div className="p-4 rounded-lg border">
               <h4 className="font-medium mb-1">Risk Assessment</h4>
-              <p className="text-2xl font-bold">{analysisData?.risk_factor}</p>
+              <p className="text-muted-foreground">
+                {analysisData?.risk_factor.replace(/^:\s*/, '').split(' - ').map((risk: string, index: number) => {
+                  if (index === 0) {
+                    return <p key={index}>{risk.trim()}</p>;
+                  }
+                  return risk.trim() ? (
+                    <p key={index} className="mt-1">• {risk.trim()}</p>
+                  ) : null;
+                })}
+              </p>
               <p className="text-sm text-muted-foreground mt-1">Based on form analysis</p>
             </div>
           </div>
@@ -191,7 +200,16 @@ export default function ResultsPage({ params }: ResultsPageProps) {
           {/* Improvements */}
           <div className="p-4 rounded-lg border">
             <h4 className="font-medium mb-2">Suggested Improvements</h4>
-            <p className="text-muted-foreground">{analysisData?.improvements}</p>
+            <div className="text-muted-foreground">
+              {analysisData?.improvements.replace(/^:\s*/, '').split(' - ').map((improvement: string, index: number) => {
+                if (index === 0) {
+                  return <p key={index}>{improvement.trim()}</p>;
+                }
+                return improvement.trim() ? (
+                  <p key={index} className="mt-1">• {improvement.trim()}</p>
+                ) : null;
+              })}
+            </div>
           </div>
           
           {/* Audio Playback if available - hidden but functional */}
