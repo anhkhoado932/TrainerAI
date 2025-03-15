@@ -66,27 +66,27 @@ export default async function HomePage() {
       
       <main className="flex-grow relative z-10">
         {/* Combined Hero, Features, and Image Section */}
-        <section className="min-h-[calc(100vh-73px-88px)] relative overflow-hidden pb-24"> {/* Added min-height and padding-bottom */}
+        <section className="min-h-[calc(100vh-73px-88px)] relative overflow-hidden pb-24">
           <div className="container mx-auto px-4 h-full relative z-10">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 h-full items-center pt-16"> {/* Added padding-top */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 h-full items-center pt-8 lg:pt-16">
               {/* Left Side Content */}
-              <div className="space-y-16">
+              <div className="space-y-8 lg:space-y-16">
                 {/* Hero Content */}
-                <div className="space-y-8">
-                  <h1 className="text-5xl md:text-6xl font-bold text-black">
+                <div className="space-y-4 lg:space-y-8">
+                  <h1 className="text-4xl lg:text-6xl font-bold text-black">
                     PT<span className="text-[#F26430]">+</span>
                   </h1>
-                  <p className="text-2xl font-medium text-[#F26430]">
+                  <p className="text-xl lg:text-2xl font-medium text-[#F26430]">
                     Your AI-Powered Personal Trainer
                   </p>
-                  <p className="text-lg text-gray-600 max-w-xl">
+                  <p className="text-base lg:text-lg text-gray-600 max-w-xl">
                     Achieve your fitness goals with smart, adaptive workout plans, real-time form correction, and 
                     AI-driven coaching—designed just for you.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 pt-4">
                     <Button 
                       size="lg" 
-                      className="w-full sm:w-auto px-6 py-5 text-base rounded-xl hover:scale-105 transition-transform bg-[#F26430] text-white hover:bg-[#F26430]/90"
+                      className="w-full sm:w-auto px-4 lg:px-6 py-4 lg:py-5 text-base rounded-xl hover:scale-105 transition-transform bg-[#F26430] text-white hover:bg-[#F26430]/90"
                       asChild
                     >
                       <Link href="/dashboard">
@@ -96,7 +96,7 @@ export default async function HomePage() {
                     <Button 
                       size="lg" 
                       variant="outline" 
-                      className="w-full sm:w-auto px-6 py-5 text-base rounded-xl border-2 border-[#F26430] text-[#F26430] bg-white hover:bg-[#F26430]/10 hover:scale-105 transition-transform"
+                      className="w-full sm:w-auto px-4 lg:px-6 py-4 lg:py-5 text-base rounded-xl border-2 border-[#F26430] text-[#F26430] bg-white hover:bg-[#F26430]/10 hover:scale-105 transition-transform"
                       asChild
                     >
                       <a href="#features">
@@ -107,11 +107,11 @@ export default async function HomePage() {
                 </div>
 
                 {/* Features */}
-                <div className="space-y-8">
-                  <h2 className="text-2xl font-bold text-black">
-                    A New Standard of Fitness,<br />On Your Terms
+                <div className="space-y-6 lg:space-y-8">
+                  <h2 className="text-xl lg:text-2xl font-bold text-black">
+                    A New Standard of Fitness,<br className="hidden sm:block" />On Your Terms
                   </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
                     {[
                       {
                         title: "Smart Workout Plans",
@@ -152,14 +152,14 @@ export default async function HomePage() {
 
               {/* Right Side - Image */}
               <div className="relative h-full hidden lg:block">
-                <div className="absolute right-[-200px] bottom-[-20px] w-[900px] h-[1100px]"> {/* Adjusted size and position */}
+                <div className="absolute right-[-100px] lg:right-[-200px] bottom-[-20px] w-[600px] lg:w-[900px] h-[800px] lg:h-[1100px]">
                   <Image
                     src="/hand.png"
                     alt="Fitness Training"
                     fill
                     className="object-contain object-bottom"
                     style={{
-                      transform: "translateY(0) rotate(5deg)", /* Removed translateY */
+                      transform: "rotate(5deg)",
                       filter: "contrast(1.1)"
                     }}
                     priority
@@ -178,7 +178,7 @@ export default async function HomePage() {
         </section>
       </main>
       
-      <footer className="bg-white/80 backdrop-blur-sm py-6 border-t border-gray-200 relative z-10"> {/* Reduced footer padding */}
+      <footer className="bg-white/80 backdrop-blur-sm py-4 lg:py-6 border-t border-gray-200 relative z-10 mt-auto">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-4 md:mb-0">
