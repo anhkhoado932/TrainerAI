@@ -192,7 +192,7 @@ export function WorkoutPlanView({ workoutPlan, isCard = false }: WorkoutPlanView
                                 disabled
                               >
                                 <Lock className="w-3.5 h-3.5" />
-                                Premium only
+                                Start
                               </Button>
                             ) : (
                               <Button 
