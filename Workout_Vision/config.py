@@ -7,9 +7,6 @@ load_dotenv()
 
 # Base paths
 BASE_DIR = Path(__file__).resolve().parent
-STORAGE_DIR = os.getenv("STORAGE_DIR", os.path.join(BASE_DIR, "storage"))
-IMAGES_DIR = os.path.join(STORAGE_DIR, "images")
-AUDIO_DIR = os.path.join(STORAGE_DIR, "audio")
 
 # API Configuration
 API_HOST = os.getenv("API_HOST", "0.0.0.0")
@@ -22,13 +19,18 @@ OPENAI_VISION_MAX_TOKENS = int(os.getenv("OPENAI_VISION_MAX_TOKENS", "500"))
 OPENAI_TTS_MODEL = os.getenv("OPENAI_TTS_MODEL", "tts-1")
 OPENAI_TTS_VOICE = os.getenv("OPENAI_TTS_VOICE", "alloy")
 
+# Supabase Configuration
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+SUPABASE_BUCKET = os.getenv("SUPABASE_BUCKET", "exercise-demo")
+
 # Video Processing Configuration
 ALLOWED_VIDEO_DOMAINS = os.getenv("ALLOWED_VIDEO_DOMAINS", "supabase.co").split(",")
-DEFAULT_FRAME_SKIP = int(os.getenv("DEFAULT_FRAME_SKIP", "5"))
+DEFAULT_FRAME_SKIP = int(os.getenv("DEFAULT_FRAME_SKIP", "10"))
 MAX_FRAME_SKIP = int(os.getenv("MAX_FRAME_SKIP", "30"))
 MIN_FRAME_SKIP = int(os.getenv("MIN_FRAME_SKIP", "1"))
 DANGER_ANGLE_THRESHOLD = float(os.getenv("DANGER_ANGLE_THRESHOLD", "60"))
-POSE_MODEL = os.getenv("POSE_MODEL", "yolo11m-pose.pt")
+POSE_MODEL =  "yolo11m-pose.pt"
 POSE_KEYPOINTS = [int(k) for k in os.getenv("POSE_KEYPOINTS", "12,14,16").split(",")]
 POSE_LINE_WIDTH = int(os.getenv("POSE_LINE_WIDTH", "4"))
 

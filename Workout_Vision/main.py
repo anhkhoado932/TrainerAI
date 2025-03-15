@@ -14,7 +14,7 @@ from typing import Optional, Dict, Any, Tuple, Callable
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Query, Response, Request, Depends, status
-from fastapi.responses import JSONResponse, FileResponse, StreamingResponse
+from fastapi.responses import JSONResponse, FileResponse, StreamingResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel, Field
@@ -24,6 +24,7 @@ from ultralytics.utils.plotting import Annotator
 
 import openai
 from dotenv import load_dotenv
+from supabase import create_client, Client
 
 # Import configuration from config.py
 import config
@@ -44,13 +45,13 @@ load_dotenv()
 if not config.OPENAI_API_KEY:
     raise ValueError("OPENAI_API_KEY environment variable is not set")
 
-# Create directories for storing files
-os.makedirs(config.STORAGE_DIR, exist_ok=True)
-os.makedirs(config.IMAGES_DIR, exist_ok=True)
-os.makedirs(config.AUDIO_DIR, exist_ok=True)
+# Check for Supabase credentials
+if not config.SUPABASE_URL or not config.SUPABASE_KEY:
+    raise ValueError("SUPABASE_URL and SUPABASE_KEY environment variables are required")
 
-logger.info(f"Images will be stored in: {config.IMAGES_DIR}")
-logger.info(f"Audio will be stored in: {config.AUDIO_DIR}")
+# Initialize Supabase client
+supabase: Client = create_client(config.SUPABASE_URL, config.SUPABASE_KEY)
+logger.info(f"Initialized Supabase client for URL: {config.SUPABASE_URL}")
 
 # Initialize OpenAI client once
 openai_client = openai.OpenAI(api_key=config.OPENAI_API_KEY)
@@ -130,90 +131,54 @@ def generate_unique_filename(prefix: str, extension: str) -> str:
     """Generate a unique filename with timestamp and random bytes."""
     return f"{prefix}_{int(time.time())}_{os.urandom(4).hex()}.{extension}"
 
-def save_binary_file(data: bytes, directory: str, filename: str) -> str:
-    """Save binary data to a file and return the file path."""
-    file_path = os.path.join(directory, filename)
-    with open(file_path, "wb") as f:
-        f.write(data)
-    logger.info(f"Saved file to {file_path}")
-    return file_path
-
-def create_url(base_url: Optional[str], path: str) -> str:
-    """Create a URL from a base URL and path."""
-    return f"{base_url}{path}" if base_url else path
+def upload_to_supabase(file_data: bytes, filename: str, content_type: str) -> str:
+    """Upload file to Supabase storage and return the public URL."""
+    try:
+        logger.info(f"Uploading {filename} to Supabase bucket: {config.SUPABASE_BUCKET}")
+        
+        # Upload the file to Supabase
+        response = supabase.storage.from_(config.SUPABASE_BUCKET).upload(
+            path=filename,
+            file=file_data,
+            file_options={"content-type": content_type}
+        )
+        
+        # Get the public URL
+        public_url = supabase.storage.from_(config.SUPABASE_BUCKET).get_public_url(filename)
+        logger.info(f"File uploaded successfully. Public URL: {public_url}")
+        
+        return public_url
+    except Exception as e:
+        logger.error(f"Error uploading to Supabase: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error uploading to Supabase: {str(e)}")
 
 # ================ API FUNCTIONS ================
 
-def download_video(url: str) -> str:
-    """Download video from Supabase public bucket URL and save to temporary file."""
+def process_video_from_url(url: str, frame_skip: int = config.DEFAULT_FRAME_SKIP) -> Dict[str, Any]:
+    """Process video directly from URL and return the frame with the lowest knee angle."""
     try:
         # Validate URL format
         valid_domain = any(domain in url for domain in config.ALLOWED_VIDEO_DOMAINS)
         if not url.startswith('https://') or not valid_domain:
             raise ValueError(f"Invalid URL format. URL must be from an allowed domain: {', '.join(config.ALLOWED_VIDEO_DOMAINS)}")
             
-        logger.info(f"Downloading video from URL: {url}")
-        response = requests.get(url, stream=True, timeout=config.HTTP_TIMEOUT)
-        response.raise_for_status()
+        logger.info(f"Processing video from URL: {url}")
         
-        # Create a temporary file
-        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.mp4')
-        
-        # Write the video content to the temporary file
-        for chunk in response.iter_content(chunk_size=config.HTTP_CHUNK_SIZE):
-            if chunk:
-                temp_file.write(chunk)
-        
-        temp_file.close()
-        logger.info(f"Video downloaded successfully to: {temp_file.name}")
-        return temp_file.name
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Error downloading video: {str(e)}")
-        raise HTTPException(status_code=400, detail=f"Error downloading video from Supabase: {str(e)}")
-    except Exception as e:
-        logger.error(f"Error processing video: {str(e)}")
-        raise HTTPException(status_code=400, detail=f"Error processing video: {str(e)}")
-
-def custom_monitor(ai_gym, frame) -> Tuple[np.ndarray, float]:
-    """Process a frame with AIGym and return the processed frame and knee angle."""
-    tracks = ai_gym.model.track(source=frame, persist=True, classes=ai_gym.CFG["classes"], **ai_gym.track_add_args)[0]
-    min_knee_angle = None
-
-    if tracks.boxes.id is not None:
-        if len(tracks) > len(ai_gym.count):
-            new_human = len(tracks) - len(ai_gym.count)
-            ai_gym.angle += [0] * new_human
-            ai_gym.count += [0] * new_human
-            ai_gym.stage += ["-"] * new_human
-
-        ai_gym.annotator = Annotator(frame, line_width=ai_gym.line_width)
-
-        for ind, k in enumerate(reversed(tracks.keypoints.data)):
-            kpts = [k[int(ai_gym.kpts[i])].cpu() for i in range(3)]
-            ai_gym.angle[ind] = ai_gym.annotator.estimate_pose_angle(*kpts)
-
-            if min_knee_angle is None or ai_gym.angle[ind] < min_knee_angle:
-                min_knee_angle = ai_gym.angle[ind]
-
-            if ai_gym.angle[ind] < config.DANGER_ANGLE_THRESHOLD:
-                ai_gym.stage[ind] = 'danger'
-                color = config.DANGER_COLOR
-            else:
-                ai_gym.stage[ind] = 'normal'
-                color = config.NORMAL_COLOR
-
-            x, y = int(k[14][0]), int(k[14][1])
-            cv2.circle(frame, (x + config.CIRCLE_OFFSET_X, y), config.CIRCLE_RADIUS, color, config.CIRCLE_THICKNESS)
-
-    return frame, (min_knee_angle if min_knee_angle is not None else 180)
-
-def process_video(video_path: str, frame_skip: int = config.DEFAULT_FRAME_SKIP, base_url: str = None) -> Dict[str, Any]:
-    """Process video and return the frame with the lowest knee angle."""
-    try:
-        logger.info(f"Opening video file: {video_path}")
-        cap = cv2.VideoCapture(video_path)
+        # Create a video capture object directly from the URL
+        cap = cv2.VideoCapture(url)
         if not cap.isOpened():
-            raise HTTPException(status_code=400, detail="Error reading video file")
+            # If direct URL capture fails, try downloading to memory and processing
+            logger.info("Direct URL capture failed, trying to download video to memory")
+            response = requests.get(url, timeout=config.HTTP_TIMEOUT)
+            response.raise_for_status()
+            
+            # Convert to numpy array and create video capture from memory
+            video_array = np.asarray(bytearray(response.content), dtype=np.uint8)
+            cap = cv2.VideoCapture()
+            cap.open(cv2.CAP_OPENCV_MJPEG, video_array)
+            
+            if not cap.isOpened():
+                raise HTTPException(status_code=400, detail="Error reading video from URL")
 
         # Initialize AIGym
         logger.info("Initializing AIGym")
@@ -260,30 +225,62 @@ def process_video(video_path: str, frame_skip: int = config.DEFAULT_FRAME_SKIP, 
         if best_frame is not None:
             # Generate a unique filename for the image
             filename = generate_unique_filename("exercise_analysis", "png")
-            image_path = os.path.join(config.IMAGES_DIR, filename)
-            
-            # Save the best frame to the file
-            cv2.imwrite(image_path, best_frame)
             
             # For GPT-4 analysis, we need the base64 encoding
             _, buffer = cv2.imencode('.png', best_frame)
-            best_frame_base64 = base64.b64encode(buffer).decode('utf-8')
+            best_frame_bytes = buffer.tobytes()
+            best_frame_base64 = base64.b64encode(best_frame_bytes).decode('utf-8')
             
-            # Create relative and absolute URLs
-            relative_url = f"/image/{filename}"
-            absolute_url = create_url(base_url, relative_url)
+            # Upload the image to Supabase
+            image_url = upload_to_supabase(best_frame_bytes, filename, "image/png")
             
             return {
                 "image_base64": best_frame_base64,  # Only used internally for GPT-4 analysis
                 "image_filename": filename,
-                "image_url": absolute_url,
+                "image_url": image_url,
                 "min_knee_angle": float(min_angle)
             }
         else:
             raise HTTPException(status_code=400, detail="No valid frames found in video")
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Error downloading video: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Error downloading video from URL: {str(e)}")
     except Exception as e:
         logger.error(f"Error in video processing: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error in video processing: {str(e)}")
+
+def custom_monitor(ai_gym, frame) -> Tuple[np.ndarray, float]:
+    """Process a frame with AIGym and return the processed frame and knee angle."""
+    tracks = ai_gym.model.track(source=frame, persist=True, classes=ai_gym.CFG["classes"], **ai_gym.track_add_args)[0]
+    min_knee_angle = None
+
+    if tracks.boxes.id is not None:
+        if len(tracks) > len(ai_gym.count):
+            new_human = len(tracks) - len(ai_gym.count)
+            ai_gym.angle += [0] * new_human
+            ai_gym.count += [0] * new_human
+            ai_gym.stage += ["-"] * new_human
+
+        ai_gym.annotator = Annotator(frame, line_width=ai_gym.line_width)
+
+        for ind, k in enumerate(reversed(tracks.keypoints.data)):
+            kpts = [k[int(ai_gym.kpts[i])].cpu() for i in range(3)]
+            ai_gym.angle[ind] = ai_gym.annotator.estimate_pose_angle(*kpts)
+
+            if min_knee_angle is None or ai_gym.angle[ind] < min_knee_angle:
+                min_knee_angle = ai_gym.angle[ind]
+
+            if ai_gym.angle[ind] < config.DANGER_ANGLE_THRESHOLD:
+                ai_gym.stage[ind] = 'danger'
+                color = config.DANGER_COLOR
+            else:
+                ai_gym.stage[ind] = 'normal'
+                color = config.NORMAL_COLOR
+
+            x, y = int(k[14][0]), int(k[14][1])
+            cv2.circle(frame, (x + config.CIRCLE_OFFSET_X, y), config.CIRCLE_RADIUS, color, config.CIRCLE_THICKNESS)
+
+    return frame, (min_knee_angle if min_knee_angle is not None else 180)
 
 def analyze_with_gpt4(image_base64: str, knee_angle: float) -> Dict[str, str]:
     """Analyze the exercise posture using GPT-4 Vision API."""
@@ -356,7 +353,7 @@ def analyze_with_gpt4(image_base64: str, knee_angle: float) -> Dict[str, str]:
         }
 
 def generate_audio_from_text(text: str, voice: str = config.OPENAI_TTS_VOICE) -> Optional[str]:
-    """Generate audio from text using OpenAI's TTS API."""
+    """Generate audio from text using OpenAI's TTS API and upload directly to Supabase."""
     try:
         logger.info(f"Generating audio for text: {text[:50]}...")
         
@@ -370,11 +367,14 @@ def generate_audio_from_text(text: str, voice: str = config.OPENAI_TTS_VOICE) ->
         # Get the audio data
         audio_data = response.content
         
-        # Encode as base64
-        audio_base64 = base64.b64encode(audio_data).decode('utf-8')
+        # Generate a unique filename
+        audio_filename = generate_unique_filename("exercise_audio", "mp3")
         
-        logger.info("Audio generation successful")
-        return audio_base64
+        # Upload to Supabase
+        audio_url = upload_to_supabase(audio_data, audio_filename, "audio/mpeg")
+        
+        logger.info("Audio generation and upload successful")
+        return audio_url
         
     except Exception as e:
         logger.error(f"Error generating audio: {str(e)}")
@@ -446,17 +446,12 @@ def parse_gpt4_response(text: str) -> Dict[str, str]:
 
 async def process_and_analyze_video(
     video_url: str, 
-    frame_skip: int = config.DEFAULT_FRAME_SKIP, 
-    base_url: Optional[str] = None
+    frame_skip: int = config.DEFAULT_FRAME_SKIP
 ) -> Dict[str, Any]:
     """Process a video, analyze it, and return the results."""
-    video_path = None
     try:
-        # Download video
-        video_path = download_video(video_url)
-        
-        # Process video with frame skipping
-        results = process_video(video_path, frame_skip, base_url)
+        # Process video directly from URL with frame skipping
+        results = process_video_from_url(video_url, frame_skip)
         
         # Get GPT-4 analysis
         gpt4_results = analyze_with_gpt4(results["image_base64"], results["min_knee_angle"])
@@ -472,27 +467,11 @@ async def process_and_analyze_video(
         
         # Generate audio from summary
         logger.info("Generating audio from summary")
-        audio_base64 = None
+        audio_url = None
         try:
-            audio_base64 = generate_audio_from_text(parsed_sections["summary"])
+            audio_url = generate_audio_from_text(parsed_sections["summary"])
         except Exception as e:
             logger.error(f"Error generating audio: {str(e)}")
-        
-        # Save audio file if generated
-        audio_url = None
-        if audio_base64:
-            try:
-                audio_filename = generate_unique_filename("exercise_audio", "mp3")
-                audio_path = os.path.join(config.AUDIO_DIR, audio_filename)
-                
-                # Save the audio to a file
-                save_binary_file(base64.b64decode(audio_base64), config.AUDIO_DIR, audio_filename)
-                
-                # Create relative and absolute URLs for audio
-                relative_audio_url = f"/audio/{audio_filename}"
-                audio_url = create_url(base_url, relative_audio_url)
-            except Exception as e:
-                logger.error(f"Error saving audio file: {str(e)}")
         
         # Combine all results
         return {
@@ -510,45 +489,6 @@ async def process_and_analyze_video(
         # Include more context in the error message
         error_message = f"An error occurred during video analysis: {str(e)}"
         raise HTTPException(status_code=500, detail=error_message)
-    finally:
-        # Clean up video file if it exists
-        if video_path and os.path.exists(video_path):
-            try:
-                os.unlink(video_path)
-                logger.info(f"Cleaned up temporary video file: {video_path}")
-            except Exception as e:
-                logger.error(f"Error cleaning up video file: {str(e)}")
-
-# Add a periodic cleanup function for temporary files
-@app.on_event("startup")
-async def setup_periodic_cleanup():
-    """Set up periodic cleanup of old files."""
-    # This could be expanded with a background task that runs periodically
-    logger.info("Setting up periodic cleanup of old files")
-    
-    # Clean up files older than 24 hours on startup
-    cleanup_old_files(config.IMAGES_DIR, hours=config.CLEANUP_HOURS)
-    cleanup_old_files(config.AUDIO_DIR, hours=config.CLEANUP_HOURS)
-
-def cleanup_old_files(directory: str, hours: int = config.CLEANUP_HOURS):
-    """Clean up files older than the specified number of hours."""
-    try:
-        current_time = time.time()
-        count = 0
-        
-        for filename in os.listdir(directory):
-            file_path = os.path.join(directory, filename)
-            # Check if the file is older than the specified hours
-            if os.path.isfile(file_path) and os.path.getmtime(file_path) < (current_time - hours * 3600):
-                try:
-                    os.remove(file_path)
-                    count += 1
-                except Exception as e:
-                    logger.error(f"Error removing old file {file_path}: {str(e)}")
-        
-        logger.info(f"Cleaned up {count} old files from {directory}")
-    except Exception as e:
-        logger.error(f"Error during cleanup of {directory}: {str(e)}")
 
 # ================ API ENDPOINTS ================
 
@@ -573,23 +513,25 @@ async def root(request: Request):
 
 @app.get("/image/{filename}")
 async def get_image(filename: str):
-    """Get an image by filename from the images directory."""
-    file_path = os.path.join(config.IMAGES_DIR, filename)
-    
-    if not os.path.exists(file_path):
+    """Redirect to the image in Supabase storage."""
+    try:
+        # Get the public URL from Supabase
+        public_url = supabase.storage.from_(config.SUPABASE_BUCKET).get_public_url(filename)
+        return RedirectResponse(url=public_url)
+    except Exception as e:
+        logger.error(f"Error getting image URL: {str(e)}")
         raise HTTPException(status_code=404, detail="Image not found")
-    
-    return FileResponse(file_path, media_type="image/png")
 
 @app.get("/audio/{filename}")
 async def get_audio(filename: str):
-    """Get an audio file by filename from the audio directory."""
-    file_path = os.path.join(config.AUDIO_DIR, filename)
-    
-    if not os.path.exists(file_path):
+    """Redirect to the audio file in Supabase storage."""
+    try:
+        # Get the public URL from Supabase
+        public_url = supabase.storage.from_(config.SUPABASE_BUCKET).get_public_url(filename)
+        return RedirectResponse(url=public_url)
+    except Exception as e:
+        logger.error(f"Error getting audio URL: {str(e)}")
         raise HTTPException(status_code=404, detail="Audio not found")
-    
-    return FileResponse(file_path, media_type="audio/mpeg")
 
 @app.get("/analyze")
 async def analyze_exercise_get(
@@ -611,26 +553,19 @@ async def analyze_exercise_get(
             }
         )
     
-    # Get the base URL for absolute URLs
-    base_url = get_base_url(request)
-    
     # Process and analyze the video
-    results = await process_and_analyze_video(video_url, frame_skip, base_url)
+    results = await process_and_analyze_video(video_url, frame_skip)
     
     return JSONResponse(content=results)
 
 @app.post("/analyze", response_model=AnalysisResponse)
 async def analyze_exercise(
     request: VideoRequest, 
-    frame_skip: int = Query(config.DEFAULT_FRAME_SKIP, ge=config.MIN_FRAME_SKIP, le=config.MAX_FRAME_SKIP),
-    request_obj: Request = None
+    frame_skip: int = Query(config.DEFAULT_FRAME_SKIP, ge=config.MIN_FRAME_SKIP, le=config.MAX_FRAME_SKIP)
 ):
     """Analyze exercise video and return the frame with the lowest knee angle, along with GPT-4 analysis."""
-    # Get the base URL if request_obj is provided
-    base_url = get_base_url(request_obj) if request_obj else None
-    
     # Process and analyze the video
-    results = await process_and_analyze_video(request.video_url, frame_skip, base_url)
+    results = await process_and_analyze_video(request.video_url, frame_skip)
     
     return JSONResponse(content=results)
 

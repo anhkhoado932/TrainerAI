@@ -97,15 +97,12 @@ This guide walks through the process of deploying the Workout Vision application
    Add the following content (replace with your actual values):
    ```
    OPENAI_API_KEY=your_openai_api_key
+   SUPABASE_KEY=your_supabase_api_key
+   SUPABASE_URL=your_supabase_url
+   SUPABASE_BUCKET=your_supabase_bucket
    API_HOST=0.0.0.0
    API_PORT=8000
-   STORAGE_DIR=/home/ubuntu/workout_vision/storage
    ALLOWED_VIDEO_DOMAINS=supabase.co
-   ```
-
-6. **Create storage directories**:
-   ```bash
-   mkdir -p storage/images storage/audio
    ```
 
 ## Step 4: Set Up a Systemd Service
