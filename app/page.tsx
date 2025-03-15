@@ -111,7 +111,7 @@ export default async function HomePage() {
                   <h2 className="text-2xl font-bold text-black">
                     A New Standard of Fitness,<br />On Your Terms
                   </h2>
-                  <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {[
                       {
                         title: "Smart Workout Plans",
@@ -131,7 +131,7 @@ export default async function HomePage() {
                     ].map((feature, index) => (
                       <div 
                         key={index}
-                        className="flex items-start space-x-4 bg-white/50 p-6 rounded-xl hover:bg-white/80 transition-all duration-300"
+                        className="flex items-start space-x-4 bg-white/50 p-6 rounded-xl hover:bg-white/80 transition-all duration-300 h-full"
                       >
                         <div className="text-3xl">
                           {feature.icon}
