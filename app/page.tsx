@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { SignOutButton } from "@/components/auth/sign-out-button"
+import { Icons } from "@/components/ui/icons"
 
 export default async function HomePage() {
   const cookieStore = cookies()
@@ -31,7 +32,10 @@ export default async function HomePage() {
 
       <header className="border-b border-gray-200 bg-white/80 backdrop-blur-sm relative z-10">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="font-bold text-xl text-black">PT+</div>
+          <div className="font-bold text-xl text-black flex items-center gap-1">
+              <Icons.dumbbell className="h-6 w-6 text-[#F26430]" />
+              PT<span className="text-[#F26430]">+</span>
+          </div>
           <nav className="flex items-center space-x-4">
             {session ? (
               <>

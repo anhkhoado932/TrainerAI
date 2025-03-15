@@ -2,6 +2,7 @@ import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 import { DashboardContent } from "@/src/components/dashboard/dashboard-content"
+import Image from 'next/image'
 
 export default async function DashboardPage() {
   const cookieStore = cookies()
@@ -21,5 +22,27 @@ export default async function DashboardPage() {
   const hasAssessment = Boolean(userData?.assessment)
   const hasWorkoutPlan = Boolean(userData?.workout_plan)
   console.log(hasAssessment, hasWorkoutPlan)
-  return <DashboardContent hasAssessment={hasAssessment} hasWorkoutPlan={hasWorkoutPlan} />
+
+  return (
+    <div className="flex flex-col min-h-screen relative">
+      {/* Background Image with Gradient Overlay */}
+      <div className="fixed inset-0 -z-10">
+        <Image
+          src="/bg-pattern.jpg"
+          alt="Background Pattern"
+          fill
+          className="object-cover"
+          priority
+          quality={100}
+        />
+        <div className="absolute inset-0 bg-white/60" />
+      </div>
+
+      {/* Pass the styling props to DashboardContent */}
+      <DashboardContent 
+        hasAssessment={hasAssessment} 
+        hasWorkoutPlan={hasWorkoutPlan} 
+      />
+    </div>
+  )
 } 

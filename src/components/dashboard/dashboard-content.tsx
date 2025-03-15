@@ -82,23 +82,25 @@ export function DashboardContent({ hasAssessment, hasWorkoutPlan }: DashboardCon
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-black">
-      <header className="border-b border-white/10 backdrop-blur-sm sticky top-0 z-50">
+    <div className="flex flex-col min-h-screen bg-white">
+      <header className="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="font-bold text-xl text-white flex items-center gap-2">
-            <Icons.logo className="h-6 w-6 text-white" />
-            AI PT
+          <div className="font-bold text-xl text-black flex items-center gap-1">
+            <Icons.dumbbell className="h-6 w-6 text-[#F26430]" />
+            PT<span className="text-[#F26430]">+</span>
           </div>
           <nav className="flex items-center space-x-4">
             <Link 
               href="/" 
-              className="text-gray-400 hover:text-white transition-colors"
+              className="text-gray-600 hover:text-[#F26430] transition-colors"
             >
               Home
             </Link>
             <SignOutButton variant="ghost" />
-            <Avatar>
-              <AvatarFallback>A</AvatarFallback>
+            <Avatar className="h-10 w-10">
+              <AvatarFallback className="bg-[#F26430] text-white text-lg">
+                A
+              </AvatarFallback>
             </Avatar>
           </nav>
         </div>
@@ -107,10 +109,10 @@ export function DashboardContent({ hasAssessment, hasWorkoutPlan }: DashboardCon
       <main className="flex-1 container mx-auto px-4 py-12">
         <div className="max-w-5xl mx-auto space-y-8">
           <div className="text-center space-y-4">
-            <h1 className="text-4xl font-bold text-white sm:text-5xl">
+            <h1 className="text-4xl font-bold text-black sm:text-5xl">
               Welcome to Your Fitness Journey
             </h1>
-            <p className="text-xl text-gray-400">
+            <p className="text-xl text-gray-600">
               Let's create your personalized fitness plan with our AI-powered assessment
             </p>
           </div>
@@ -137,7 +139,7 @@ export function DashboardContent({ hasAssessment, hasWorkoutPlan }: DashboardCon
 
             <Card 
               ref={(el) => setCardRef(el, 0)}
-              className="bg-zinc-900/80 border border-white/10 hover:border-white/20 transition-all relative overflow-hidden group flex flex-col"
+              className="bg-white border-gray-200 hover:shadow-lg hover:shadow-[#F26430]/10 transition-all relative overflow-hidden group flex flex-col h-[300px]"
             >
               {/* Card-specific glow effect */}
               <div 
@@ -152,30 +154,29 @@ export function DashboardContent({ hasAssessment, hasWorkoutPlan }: DashboardCon
               <div className="absolute -left-10 -top-10 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl group-hover:bg-blue-500/30 transition-colors duration-500 animate-pulse-slow" />
               <div className="absolute -right-20 -bottom-20 w-60 h-60 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-colors duration-500 animate-pulse-slower" />
               
-              <div className="p-6 relative h-full flex flex-col z-10 backdrop-blur-sm">
-                <div className="mb-4">
+              <div className="p-6 relative flex flex-col h-full">
+                <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <Icons.fileText className="h-5 w-5 text-white" />
-                    <h2 className="text-lg font-semibold text-white">Assessment</h2>
+                    <Icons.fileText className="h-5 w-5 text-[#F26430]" />
+                    <h2 className="text-lg font-semibold text-black">Assessment</h2>
                   </div>
-                  <p className="text-gray-400 text-sm min-h-[40px]">
+                  <p className="text-gray-600 text-sm">
                     {hasAssessment 
                       ? "Your fitness assessment has been completed" 
                       : "Complete a quick assessment to get started"}
                   </p>
                 </div>
                 
-                <div className="mt-auto">
+                <div className="mt-auto pt-4">
                   <Button 
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white relative overflow-hidden group/btn h-10"
+                    className="w-full bg-[#F26430] hover:bg-[#F26430]/90 text-white relative overflow-hidden group/btn py-1.5 px-6 rounded-lg"
                     asChild
                   >
                     <Link href="/assessment" className="flex items-center justify-center gap-2">
-                      <span className="relative z-10">
+                      <span className="relative z-10 text-xs">
                         {hasAssessment ? "View Assessment" : "Start Assessment"}
                       </span>
-                      <Icons.arrowRight className="h-4 w-4 relative z-10 group-hover/btn:translate-x-1 transition-transform" />
-                      <div className="absolute inset-0 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-blue-500 to-indigo-500" />
+                      <Icons.arrowRight className="h-3 w-3 relative z-10 group-hover/btn:translate-x-1 transition-transform" />
                     </Link>
                   </Button>
                 </div>
@@ -184,7 +185,7 @@ export function DashboardContent({ hasAssessment, hasWorkoutPlan }: DashboardCon
 
             <Card 
               ref={(el) => setCardRef(el, 1)}
-              className="bg-zinc-900/80 border border-white/10 hover:border-white/20 transition-all relative overflow-hidden group flex flex-col"
+              className="bg-white border-gray-200 hover:shadow-lg hover:shadow-[#F26430]/10 transition-all relative overflow-hidden group flex flex-col h-[300px]"
             >
               {/* Card-specific glow effect */}
               <div 
@@ -199,33 +200,32 @@ export function DashboardContent({ hasAssessment, hasWorkoutPlan }: DashboardCon
               <div className="absolute -left-20 -bottom-20 w-60 h-60 bg-purple-500/10 rounded-full blur-3xl group-hover:bg-purple-500/20 transition-colors duration-500 animate-pulse-slow" />
               <div className="absolute -right-10 -top-10 w-40 h-40 bg-pink-500/10 rounded-full blur-3xl group-hover:bg-pink-500/20 transition-colors duration-500 animate-pulse-slower" />
               
-              <div className="p-6 relative h-full flex flex-col z-10 backdrop-blur-sm">
-                <div className="mb-4">
+              <div className="p-6 relative flex flex-col h-full">
+                <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <Icons.dumbbell className="h-5 w-5 text-white" />
-                    <h2 className="text-lg font-semibold text-white">Workouts</h2>
+                    <Icons.dumbbell className="h-5 w-5 text-[#F26430]" />
+                    <h2 className="text-lg font-semibold text-black">Workouts</h2>
                   </div>
-                  <p className="text-gray-400 text-sm min-h-[40px]">
+                  <p className="text-gray-600 text-sm">
                     {hasWorkoutPlan 
                       ? "View your personalized workout plans" 
                       : "Complete assessment to unlock workout plans"}
                   </p>
                 </div>
                 
-                <div className="mt-auto">
+                <div className="mt-auto pt-4">
                   {hasWorkoutPlan ? (
                     <Button 
-                      className="w-full bg-purple-600 hover:bg-purple-700 text-white relative overflow-hidden group/btn h-10"
+                      className="w-full bg-[#F26430] hover:bg-[#F26430]/90 text-white relative overflow-hidden group/btn py-1.5 px-6 rounded-lg"
                       asChild
                     >
                       <Link href="/workout" className="flex items-center justify-center gap-2">
-                        <span className="relative z-10">View Workouts</span>
-                        <Icons.arrowRight className="h-4 w-4 relative z-10 group-hover/btn:translate-x-1 transition-transform" />
-                        <div className="absolute inset-0 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-purple-500 to-pink-500" />
+                        <span className="relative z-10 text-xs">View Workouts</span>
+                        <Icons.arrowRight className="h-3 w-3 relative z-10 group-hover/btn:translate-x-1 transition-transform" />
                       </Link>
                     </Button>
                   ) : (
-                    <div className="flex items-center justify-center h-10 text-center text-gray-500">
+                    <div className="flex items-center justify-center h-[24px] text-center text-gray-500">
                       {hasAssessment ? "Generating your plan..." : "Coming Soon"}
                     </div>
                   )}
@@ -235,7 +235,7 @@ export function DashboardContent({ hasAssessment, hasWorkoutPlan }: DashboardCon
 
             <Card 
               ref={(el) => setCardRef(el, 2)}
-              className="bg-zinc-900/80 border border-white/10 hover:border-white/20 transition-all relative overflow-hidden group flex flex-col"
+              className="bg-white border-gray-200 hover:shadow-lg hover:shadow-[#F26430]/10 transition-all relative overflow-hidden group flex flex-col h-[300px]"
             >
               {/* Card-specific glow effect */}
               <div 
@@ -250,19 +250,19 @@ export function DashboardContent({ hasAssessment, hasWorkoutPlan }: DashboardCon
               <div className="absolute -right-20 -bottom-20 w-60 h-60 bg-green-500/10 rounded-full blur-3xl group-hover:bg-green-500/20 transition-colors duration-500 animate-pulse-slow" />
               <div className="absolute -left-10 -top-10 w-40 h-40 bg-teal-500/10 rounded-full blur-3xl group-hover:bg-teal-500/20 transition-colors duration-500 animate-pulse-slower" />
               
-              <div className="p-6 relative h-full flex flex-col z-10 backdrop-blur-sm">
-                <div className="mb-4">
+              <div className="p-6 relative flex flex-col h-full">
+                <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <Icons.chart className="h-5 w-5 text-white" />
-                    <h2 className="text-lg font-semibold text-white">Progress</h2>
+                    <Icons.chart className="h-5 w-5 text-[#F26430]" />
+                    <h2 className="text-lg font-semibold text-black">Progress</h2>
                   </div>
-                  <p className="text-gray-400 text-sm min-h-[40px]">
+                  <p className="text-gray-600 text-sm">
                     Track your fitness journey progress
                   </p>
                 </div>
                 
-                <div className="mt-auto">
-                  <div className="flex items-center justify-center h-10 text-center text-gray-500">
+                <div className="mt-auto pt-4">
+                  <div className="flex items-center justify-center h-[48px] text-center text-gray-500">
                     Coming Soon
                   </div>
                 </div>
@@ -270,8 +270,8 @@ export function DashboardContent({ hasAssessment, hasWorkoutPlan }: DashboardCon
             </Card>
           </div>
 
-          <div className="bg-zinc-900/30 border border-white/10 rounded-lg p-6 text-center">
-            <p className="text-sm text-gray-400">
+          <div className="bg-[#F26430]/5 border border-[#F26430]/10 rounded-lg p-6 text-center">
+            <p className="text-sm text-gray-600">
               Complete your assessment to unlock personalized workout plans and progress tracking
             </p>
           </div>
