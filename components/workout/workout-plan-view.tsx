@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { ChevronRight, Dumbbell, Heart, Timer } from "lucide-react"
+import { ChevronRight, Dumbbell, Heart, Play, Timer } from "lucide-react"
 import { motion } from "framer-motion"
+import { useRouter } from "next/navigation"
 
 interface WorkoutPlan {
   overview: string
@@ -44,6 +45,7 @@ interface WorkoutPlanViewProps {
 }
 
 export function WorkoutPlanView({ workoutPlan, isCard = false }: WorkoutPlanViewProps) {
+  const router = useRouter()
   const [selectedDay, setSelectedDay] = useState("day1")
   const days = Object.keys(workoutPlan.weeklySchedule)
 
@@ -60,6 +62,13 @@ export function WorkoutPlanView({ workoutPlan, isCard = false }: WorkoutPlanView
   const item = {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0 }
+  }
+
+  const handleStartExercise = (exerciseName: string) => {
+    // Convert exercise name to URL-friendly format
+    const formattedName = exerciseName.toLowerCase().replace(/\s+/g, '-')
+    // Navigate to the exercise page
+    router.push(`/workout/start/${formattedName}`)
   }
 
   return (
@@ -107,22 +116,35 @@ export function WorkoutPlanView({ workoutPlan, isCard = false }: WorkoutPlanView
                     <motion.div
                       key={index}
                       variants={item}
-                      className="flex items-center gap-4 p-3 rounded-lg bg-card/50 hover:bg-card/80 transition-colors"
+                      className="flex flex-col p-3 rounded-lg bg-card/50 hover:bg-card/80 transition-colors"
                     >
-                      <div className="flex-1">
-                        <h4 className="font-medium">{exercise.name}</h4>
-                        <p className="text-sm text-muted-foreground">{exercise.notes}</p>
+                      <div className="flex items-center gap-4 w-full">
+                        <div className="flex-1">
+                          <h4 className="font-medium">{exercise.name}</h4>
+                          <p className="text-sm text-muted-foreground">{exercise.notes}</p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <Badge variant="outline">
+                            {exercise.sets} × {exercise.reps}
+                          </Badge>
+                          <Badge variant="secondary">
+                            <Timer className="w-3 h-3 mr-1" />
+                            {exercise.rest}
+                          </Badge>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-muted-foreground" />
                       </div>
-                      <div className="flex items-center gap-3">
-                        <Badge variant="outline">
-                          {exercise.sets} × {exercise.reps}
-                        </Badge>
-                        <Badge variant="secondary">
-                          <Timer className="w-3 h-3 mr-1" />
-                          {exercise.rest}
-                        </Badge>
+                      <div className="mt-3 w-full">
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="w-full flex items-center justify-center gap-1 text-green-500 border-green-500/20 hover:bg-green-500/10 hover:text-green-600"
+                          onClick={() => handleStartExercise(exercise.name)}
+                        >
+                          <Play className="w-3.5 h-3.5" />
+                          Start Exercise
+                        </Button>
                       </div>
-                      <ChevronRight className="w-5 h-5 text-muted-foreground" />
                     </motion.div>
                   ))}
                 </div>
@@ -138,15 +160,26 @@ export function WorkoutPlanView({ workoutPlan, isCard = false }: WorkoutPlanView
                       <div className="flex items-center justify-between">
                         <div>
                           <h4 className="font-medium">
-                            {workoutPlan.weeklySchedule[day].cardio.type}
+                            {workoutPlan.weeklySchedule[day].cardio?.type}
                           </h4>
                           <p className="text-sm text-muted-foreground">
-                            {workoutPlan.weeklySchedule[day].cardio.duration}
+                            {workoutPlan.weeklySchedule[day].cardio?.duration}
                           </p>
                         </div>
                         <Badge>
-                          {workoutPlan.weeklySchedule[day].cardio.intensity}
+                          {workoutPlan.weeklySchedule[day].cardio?.intensity}
                         </Badge>
+                      </div>
+                      <div className="mt-3 w-full">
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="w-full flex items-center justify-center gap-1 text-green-500 border-green-500/20 hover:bg-green-500/10 hover:text-green-600"
+                          onClick={() => workoutPlan.weeklySchedule[day].cardio && handleStartExercise(workoutPlan.weeklySchedule[day].cardio.type)}
+                        >
+                          <Play className="w-3.5 h-3.5" />
+                          Start Cardio
+                        </Button>
                       </div>
                     </div>
                   </motion.div>
