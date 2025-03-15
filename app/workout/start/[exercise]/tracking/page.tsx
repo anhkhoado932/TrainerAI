@@ -297,7 +297,7 @@ export default function TrackingPage({ params }: TrackingPageProps) {
 
   return (
     <div className="container max-w-4xl py-10 space-y-8">
-      <Card className="border-green-500/20">
+      <Card className="border-[#F26430]/20">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
@@ -328,27 +328,27 @@ export default function TrackingPage({ params }: TrackingPageProps) {
           </div>
           
           {workoutComplete ? (
-            <div className="bg-green-50 dark:bg-green-950/20 p-8 rounded-lg border border-green-200 dark:border-green-900 text-center">
-              <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+            <div className="bg-[#F26430]/10 p-8 rounded-lg border border-[#F26430]/20 text-center">
+              <CheckCircle className="w-16 h-16 text-[#F26430] mx-auto mb-4" />
               <h3 className="text-2xl font-bold mb-2">Workout Complete!</h3>
               <p className="text-muted-foreground mb-6">
                 You've completed all {exerciseData?.sets || 3} sets of {exerciseName}. Great job!
               </p>
               <Button 
-                className="bg-green-500 hover:bg-green-600"
+                className="bg-[#F26430] hover:bg-[#F26430]/90"
                 onClick={finishWorkout}
               >
                 Finish Workout
               </Button>
             </div>
           ) : isResting ? (
-            <div className="bg-blue-50 dark:bg-blue-950/20 p-8 rounded-lg border border-blue-200 dark:border-blue-900 text-center">
-              <Timer className="w-16 h-16 text-blue-500 mx-auto mb-4" />
+            <div className="bg-[#F26430]/10 p-8 rounded-lg border border-[#F26430]/20 text-center">
+              <Timer className="w-16 h-16 text-[#F26430] mx-auto mb-4" />
               <h3 className="text-2xl font-bold mb-2">Rest Time</h3>
               <p className="text-muted-foreground mb-2">
                 Take a break before your next set
               </p>
-              <div className="text-4xl font-bold text-blue-500 mb-6">
+              <div className="text-4xl font-bold text-[#F26430] mb-6">
                 {formatTime(restTimeRemaining)}
               </div>
               <Button 
@@ -384,13 +384,13 @@ export default function TrackingPage({ params }: TrackingPageProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="p-6 rounded-lg border text-center">
                   <h3 className="text-lg font-medium mb-2">Current Set</h3>
-                  <div className="text-5xl font-bold text-green-500 mb-2">{currentSet}</div>
+                  <div className="text-5xl font-bold text-[#F26430] mb-2">{currentSet}</div>
                   <p className="text-sm text-muted-foreground">of {exerciseData?.sets || 3} sets</p>
                 </div>
                 
                 <div className="p-6 rounded-lg border text-center">
                   <h3 className="text-lg font-medium mb-2">Set Duration</h3>
-                  <div className="text-5xl font-bold text-green-500 mb-2">{formatTime(exerciseData?.["set-durations"] || 45)}</div>
+                  <div className="text-5xl font-bold text-[#F26430] mb-2">{formatTime(exerciseData?.["set-durations"] || 45)}</div>
                   <p className="text-sm text-muted-foreground">per set</p>
                 </div>
               </div>
@@ -401,7 +401,7 @@ export default function TrackingPage({ params }: TrackingPageProps) {
                 
                 <div className="flex justify-center mt-4">
                   <Button 
-                    className="bg-green-500 hover:bg-green-600 flex items-center gap-2 px-8 py-6 text-lg"
+                    className="bg-[#F26430] hover:bg-[#F26430]/90 flex items-center gap-2 px-8 py-6 text-lg"
                     onClick={startSet}
                   >
                     <Timer className="h-5 w-5" />
@@ -452,7 +452,7 @@ export default function TrackingPage({ params }: TrackingPageProps) {
           
           {!workoutComplete && !isPerformingSet && !isResting && (
             <Button 
-              className="bg-green-500 hover:bg-green-600"
+              className="bg-[#F26430] hover:bg-[#F26430]/90"
               onClick={finishWorkout}
             >
               Skip to Finish

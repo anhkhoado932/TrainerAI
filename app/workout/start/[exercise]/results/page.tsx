@@ -104,10 +104,10 @@ export default function ResultsPage({ params }: ResultsPageProps) {
   if (loading) {
     return (
       <div className="container max-w-4xl py-10 space-y-8">
-        <Card className="border-green-500/20">
+        <Card className="border-[#F26430]/20">
           <CardContent className="flex items-center justify-center py-20">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#F26430] mx-auto mb-4"></div>
               <p className="text-muted-foreground">Loading analysis results...</p>
             </div>
           </CardContent>
@@ -119,7 +119,7 @@ export default function ResultsPage({ params }: ResultsPageProps) {
   if (error) {
     return (
       <div className="container max-w-4xl py-10 space-y-8">
-        <Card className="border-green-500/20">
+        <Card className="border-[#F26430]/20">
           <CardContent className="py-10">
             <Alert variant="destructive" className="mb-6">
               <Info className="h-4 w-4" />
@@ -141,7 +141,7 @@ export default function ResultsPage({ params }: ResultsPageProps) {
 
   return (
     <div className="container max-w-4xl py-10 space-y-8">
-      <Card className="border-green-500/20">
+      <Card className="border-[#F26430]/20">
         <CardHeader>
           <CardTitle className="text-2xl text-center">
             {exerciseName} Analysis Results
@@ -236,7 +236,10 @@ export default function ResultsPage({ params }: ResultsPageProps) {
               Record Again
             </Link>
           </Button>
-          <Button className="bg-green-500 hover:bg-green-600" asChild>
+          <Button 
+            className="bg-[#F26430] hover:bg-[#F26430]/90"
+            asChild
+          >
             <Link href={`/workout/start/${exercise}/tracking`}>
               Continue Workout
               <ChevronRight className="ml-2 h-4 w-4" />

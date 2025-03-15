@@ -18,11 +18,11 @@ export default function ExerciseStartPage({ params }: ExerciseStartPageProps) {
 
   return (
     <div className="container max-w-4xl py-10 space-y-8">
-      <Card className="border-green-500/20">
+      <Card className="border-[#F26430]/20">
         <CardHeader className="pb-4">
           <div className="flex items-center justify-center mb-6">
-            <div className="w-20 h-20 rounded-full bg-green-500/10 flex items-center justify-center">
-              <Dumbbell className="w-10 h-10 text-green-500" />
+            <div className="w-20 h-20 rounded-full bg-[#F26430]/10 flex items-center justify-center">
+              <Dumbbell className="w-10 h-10 text-[#F26430]" />
             </div>
           </div>
           <CardTitle className="text-3xl text-center">
@@ -40,7 +40,7 @@ export default function ExerciseStartPage({ params }: ExerciseStartPageProps) {
         <CardFooter className="flex flex-col gap-4">
           <Button 
             size="lg" 
-            className="w-full bg-green-500 hover:bg-green-600 flex items-center justify-center gap-2"
+            className="w-full bg-[#F26430] hover:bg-[#F26430]/90 flex items-center justify-center gap-2"
             asChild
           >
             <Link href={`/workout/start/${params.exercise}/video`}>

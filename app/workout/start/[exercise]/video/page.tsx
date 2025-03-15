@@ -23,7 +23,7 @@ export default function VideoPage({ params }: VideoPageProps) {
 
   return (
     <div className="container max-w-4xl py-10 space-y-8">
-      <Card className="border-green-500/20">
+      <Card className="border-[#F26430]/20">
         <CardHeader>
           <CardTitle className="text-2xl">
             {exerciseName} Video Demonstration
@@ -54,7 +54,7 @@ export default function VideoPage({ params }: VideoPageProps) {
               Back
             </Link>
           </Button>
-          <Button className="bg-green-500 hover:bg-green-600 flex items-center gap-2" asChild>
+          <Button className="bg-[#F26430] hover:bg-[#F26430]/90 flex items-center gap-2" asChild>
             <Link href={`/workout/start/${params.exercise}/record`}>
               <Video className="h-4 w-4" />
               Record Your Demo

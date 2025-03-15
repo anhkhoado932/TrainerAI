@@ -90,7 +90,7 @@ export function WorkoutPlanView({ workoutPlan, isCard = false }: WorkoutPlanView
               <TabsTrigger
                 key={day}
                 value={day}
-                className="data-[state=active]:bg-green-500/20 data-[state=active]:text-green-500"
+                className="data-[state=active]:bg-[#F26430]/20 data-[state=active]:text-[#F26430]"
               >
                 Day {index + 1}
               </TabsTrigger>
@@ -138,7 +138,7 @@ export function WorkoutPlanView({ workoutPlan, isCard = false }: WorkoutPlanView
                         <Button 
                           size="sm" 
                           variant="outline" 
-                          className="w-full flex items-center justify-center gap-1 text-green-500 border-green-500/20 hover:bg-green-500/10 hover:text-green-600"
+                          className="w-full flex items-center justify-center gap-1 text-[#F26430] border-[#F26430]/20 hover:bg-[#F26430]/10 hover:text-[#F26430]/90"
                           onClick={() => handleStartExercise(exercise.name)}
                         >
                           <Play className="w-3.5 h-3.5" />
@@ -174,7 +174,7 @@ export function WorkoutPlanView({ workoutPlan, isCard = false }: WorkoutPlanView
                         <Button 
                           size="sm" 
                           variant="outline" 
-                          className="w-full flex items-center justify-center gap-1 text-green-500 border-green-500/20 hover:bg-green-500/10 hover:text-green-600"
+                          className="w-full flex items-center justify-center gap-1 text-[#F26430] border-[#F26430]/20 hover:bg-[#F26430]/10 hover:text-[#F26430]/90"
                           onClick={() => workoutPlan.weeklySchedule[day].cardio && handleStartExercise(workoutPlan.weeklySchedule[day].cardio.type)}
                         >
                           <Play className="w-3.5 h-3.5" />
@@ -187,7 +187,7 @@ export function WorkoutPlanView({ workoutPlan, isCard = false }: WorkoutPlanView
 
                 {!isCard && (
                   <motion.div variants={item} className="pt-6">
-                    <Button size="lg" className="w-full">
+                    <Button size="lg" className="w-full bg-[#F26430] hover:bg-[#F26430]/90">
                       Start Workout
                     </Button>
                   </motion.div>

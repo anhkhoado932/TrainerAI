@@ -372,7 +372,7 @@ export default function RecordPage({ params }: RecordPageProps) {
 
   return (
     <div className="container max-w-4xl py-10 space-y-8">
-      <Card className="border-green-500/20">
+      <Card className="border-[#F26430]/20">
         <CardHeader>
           <CardTitle className="text-2xl">
             Record Your {exerciseName}
@@ -434,7 +434,7 @@ export default function RecordPage({ params }: RecordPageProps) {
                 <p className="text-white text-xl font-medium mb-2">{processingStep}</p>
                 <div className="w-64 bg-gray-700 rounded-full h-2.5 mb-4">
                   <div 
-                    className="bg-green-500 h-2.5 rounded-full transition-all duration-300 ease-in-out" 
+                    className="bg-[#F26430] h-2.5 rounded-full transition-all duration-300 ease-in-out"
                     style={{ width: `${processingProgress}%` }}
                   ></div>
                 </div>
@@ -481,7 +481,7 @@ export default function RecordPage({ params }: RecordPageProps) {
           {!isRecording && !hasRecorded && !isCountingDown ? (
             <Button 
               onClick={startCountdown}
-              className="bg-green-500 hover:bg-green-600 flex items-center gap-2"
+              className="bg-[#F26430] hover:bg-[#F26430]/90 flex items-center gap-2"
             >
               <Video className="h-4 w-4" />
               Start Recording
@@ -516,7 +516,7 @@ export default function RecordPage({ params }: RecordPageProps) {
               </Button>
               <Button 
                 onClick={submitRecording}
-                className="bg-green-500 hover:bg-green-600 flex items-center gap-2"
+                className="bg-[#F26430] hover:bg-[#F26430]/90 flex items-center gap-2"
                 disabled={isUploading || isProcessing}
               >
                 {isUploading || isProcessing ? (
