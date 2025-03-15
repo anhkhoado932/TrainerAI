@@ -47,7 +47,8 @@ export default function RecordPage({ params }: RecordPageProps) {
   const chunksRef = useRef<BlobPart[]>([])
   const timerRef = useRef<NodeJS.Timeout | null>(null)
   const countdownRef = useRef<NodeJS.Timeout | null>(null)
-  const processingTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const animationStartedRef = useRef<boolean>(false)
+  const timeoutsRef = useRef<number[]>([])
   
   const MAX_RECORDING_TIME = 5 // 5 seconds
   
@@ -72,58 +73,92 @@ export default function RecordPage({ params }: RecordPageProps) {
       if (countdownRef.current) {
         clearInterval(countdownRef.current)
       }
-      if (processingTimerRef.current) {
-        clearInterval(processingTimerRef.current)
-      }
       if (videoUrl) {
         URL.revokeObjectURL(videoUrl)
       }
     }
   }, [videoUrl])
 
-  // Processing animation sequence
+  // Processing animation sequence - completely rewritten for reliability
   useEffect(() => {
-    if (isUploading || isProcessing) {
-      const steps = [
-        "Uploading video...",
-        "Analyzing " + exerciseName + " form with YOLO...",
-        "Deep Analysis...",
-        "Finalizing Result..."
-      ]
+    // Only run when uploading or processing starts and animation hasn't started yet
+    if ((isUploading || isProcessing) && !animationStartedRef.current) {
+      // Mark that we've started the animation
+      animationStartedRef.current = true;
       
-      const progressValues = [25, 50, 75, 100] // YOLO analysis takes 60% (from 10% to 70%)
+      // Clear any existing timeouts
+      timeoutsRef.current.forEach(timeoutId => clearTimeout(timeoutId));
+      timeoutsRef.current = [];
       
-      let currentStepIndex = 0
-      setProcessingStep(steps[currentStepIndex])
-      setProcessingProgress(progressValues[currentStepIndex])
+      // Define all steps and their properties
+      const animationSteps = [
+        { text: "Uploading video...", progress: 25, duration: 1500 },
+        { text: "Analyzing " + exerciseName + " form with YOLO...", progress: 50, duration: 6000 },
+        { text: "Deep Analysis...", progress: 75, duration: 2000 },
+        { text: "Finalizing Result...", progress: 100, duration: null } // Last step stays until complete
+      ];
       
-      // Set up a sequence of timeouts for each step, with YOLO taking longer
-      const stepDurations = [1500, 6000, 2000, null] // Last step has no duration (stays there)
+      // Set initial step
+      setProcessingStep(animationSteps[0].text);
+      setProcessingProgress(animationSteps[0].progress);
       
-      const runNextStep = (index: number) => {
-        if (index >= steps.length) return
+      // Function to schedule all steps at once with absolute timing
+      const scheduleAllSteps = () => {
+        let cumulativeTime = 0;
         
-        setProcessingStep(steps[index])
-        setProcessingProgress(progressValues[index])
-        
-        // Only proceed to next step if not at the final step and duration is set
-        if (index < steps.length - 1 && stepDurations[index] !== null) {
-          processingTimerRef.current = setTimeout(() => {
-            runNextStep(index + 1)
-          }, stepDurations[index] as number) as unknown as NodeJS.Timeout
+        // Schedule each step (except the last one which has no duration)
+        for (let i = 1; i < animationSteps.length; i++) {
+          const step = animationSteps[i];
+          const prevStep = animationSteps[i-1];
+          
+          // Add previous step's duration to cumulative time
+          cumulativeTime += prevStep.duration || 0;
+          
+          // Skip steps with null duration
+          if (prevStep.duration === null) continue;
+          
+          // Schedule this step to run after cumulative time
+          const timeoutId = window.setTimeout(() => {
+            if (document.visibilityState !== 'hidden') { // Only update if page is visible
+              setProcessingStep(step.text);
+              setProcessingProgress(step.progress);
+            }
+          }, cumulativeTime);
+          
+          // Store the timeout ID so we can clear it if needed
+          timeoutsRef.current.push(timeoutId);
         }
-      }
+      };
       
-      // Start the sequence
-      runNextStep(0)
+      // Start scheduling all steps
+      scheduleAllSteps();
       
-      return () => {
-        if (processingTimerRef.current) {
-          clearTimeout(processingTimerRef.current)
-        }
-      }
+      // Log for debugging
+      console.log('Animation sequence started');
     }
-  }, [isUploading, isProcessing, exerciseName])
+    
+    // Reset animation flag when both uploading and processing are false
+    if (!isUploading && !isProcessing) {
+      // Clear any existing timeouts
+      timeoutsRef.current.forEach(timeoutId => clearTimeout(timeoutId));
+      timeoutsRef.current = [];
+      
+      // Reset animation flag
+      animationStartedRef.current = false;
+      
+      // Reset processing state
+      setProcessingStep("");
+      setProcessingProgress(0);
+      
+      // Log for debugging
+      console.log('Animation sequence reset');
+    }
+    
+    // Cleanup function
+    return () => {
+      // No need to clear timeouts here as we're tracking them in timeoutsRef
+    };
+  }, [isUploading, isProcessing, exerciseName]);
 
   // Get available camera devices
   const getAvailableCameras = async () => {
@@ -362,9 +397,14 @@ export default function RecordPage({ params }: RecordPageProps) {
       return
     }
     
-    setIsUploading(true)
-    setProcessingStep("Uploading video...")
-    setProcessingProgress(25)
+    // Reset animation state before starting
+    animationStartedRef.current = false;
+    timeoutsRef.current.forEach(timeoutId => clearTimeout(timeoutId));
+    timeoutsRef.current = [];
+    
+    // Start the upload process
+    setIsUploading(true);
+    console.log('Starting upload process');
     
     try {
       // Generate a unique filename using timestamp and exercise name
@@ -392,6 +432,7 @@ export default function RecordPage({ params }: RecordPageProps) {
       console.log("Video uploaded successfully:", videoPublicUrl)
       
       // Now call the Felix backend with the video URL
+      console.log('Starting processing phase');
       setIsProcessing(true)
       setIsUploading(false)
       
@@ -444,11 +485,16 @@ export default function RecordPage({ params }: RecordPageProps) {
       console.error("Error processing video:", error)
       toast.error("Failed to process video. Please try again.")
     } finally {
+      console.log('Finishing processing');
       setIsUploading(false)
       setIsProcessing(false)
-      if (processingTimerRef.current) {
-        clearTimeout(processingTimerRef.current)
-      }
+      
+      // Clear any remaining timeouts
+      timeoutsRef.current.forEach(timeoutId => clearTimeout(timeoutId));
+      timeoutsRef.current = [];
+      
+      // Reset animation flag
+      animationStartedRef.current = false;
     }
   }
 
