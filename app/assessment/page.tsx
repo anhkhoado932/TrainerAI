@@ -5,11 +5,17 @@ import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 
 export default async function AssessmentPage() {
-  const supabase = createServerComponentClient({ cookies })
+  // Create a new supabase browser client using the cookies() middleware
+  const cookieStore = cookies()
+  const supabase = createServerComponentClient({
+    cookies: () => cookieStore,
+  })
   
+  // Get the user's session
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  // Fetch user data
   const { data: userData } = await supabase
     .from('user_data')
     .select('assessment, workout_plan')
