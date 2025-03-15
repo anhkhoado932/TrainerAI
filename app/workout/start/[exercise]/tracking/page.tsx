@@ -296,7 +296,7 @@ export default function TrackingPage({ params }: TrackingPageProps) {
   }
 
   return (
-    <div className="container max-w-4xl py-10 space-y-8">
+    <div className="flex min-h-screen flex-col items-center justify-center">
       <Card className="border-[#F26430]/20">
         <CardHeader>
           <div className="flex items-center justify-between">

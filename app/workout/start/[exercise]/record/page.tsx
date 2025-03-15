@@ -499,7 +499,7 @@ export default function RecordPage({ params }: RecordPageProps) {
   }
 
   return (
-    <div className="container max-w-4xl py-10 space-y-8">
+    <div className="flex min-h-screen flex-col items-center justify-center">
       <Card className="border-[#F26430]/20">
         <CardHeader>
           <CardTitle className="text-2xl">

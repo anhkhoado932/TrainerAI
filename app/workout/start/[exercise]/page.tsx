@@ -17,7 +17,7 @@ export default function ExerciseStartPage({ params }: ExerciseStartPageProps) {
     .join(" ")
 
   return (
-    <div className="container max-w-4xl py-10 space-y-8">
+    <div className="flex min-h-screen flex-col items-center justify-center">
       <Card className="border-[#F26430]/20">
         <CardHeader className="pb-4">
           <div className="flex items-center justify-center mb-6">

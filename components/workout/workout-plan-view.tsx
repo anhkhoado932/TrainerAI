@@ -121,9 +121,18 @@ export function WorkoutPlanView({ workoutPlan, isCard = false }: WorkoutPlanView
                       <motion.div
                         key={index}
                         variants={item}
-                        className="flex flex-col p-3 rounded-lg bg-card/50 hover:bg-card/80 transition-colors"
+                        className={`flex flex-col p-3 rounded-lg ${
+                          isPremiumExercise(exercise.name)
+                            ? "bg-card/30 opacity-70 relative"
+                            : "bg-card/50 hover:bg-card/80"
+                        } transition-colors`}
                       >
-                        <div className="flex items-center gap-4 w-full">
+                        {isPremiumExercise(exercise.name) && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/5 rounded-lg z-10">
+                            <Lock className="w-6 h-6 text-muted-foreground" />
+                          </div>
+                        )}
+                        <div className={`flex items-center gap-4 w-full ${isPremiumExercise(exercise.name) ? "opacity-60" : ""}`}>
                           <div className="flex-1">
                             <h4 className="font-medium">{exercise.name}</h4>
                             <p className="text-sm text-muted-foreground">{exercise.notes}</p>
@@ -170,8 +179,19 @@ export function WorkoutPlanView({ workoutPlan, isCard = false }: WorkoutPlanView
                         <Heart className="w-5 h-5" />
                         Cardio
                       </h3>
-                      <div className="p-3 rounded-lg bg-card/50">
-                        <div className="flex items-center justify-between">
+                      <div className={`p-3 rounded-lg ${
+                        isPremiumExercise(workoutPlan.weeklySchedule[day].cardio?.type || "")
+                          ? "bg-card/30 opacity-70 relative"
+                          : "bg-card/50"
+                      }`}>
+                        {isPremiumExercise(workoutPlan.weeklySchedule[day].cardio?.type || "") && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/5 rounded-lg z-10">
+                            <Lock className="w-6 h-6 text-muted-foreground" />
+                          </div>
+                        )}
+                        <div className={`flex items-center justify-between ${
+                          isPremiumExercise(workoutPlan.weeklySchedule[day].cardio?.type || "") ? "opacity-60" : ""
+                        }`}>
                           <div>
                             <h4 className="font-medium">
                               {workoutPlan.weeklySchedule[day].cardio?.type}
@@ -192,7 +212,7 @@ export function WorkoutPlanView({ workoutPlan, isCard = false }: WorkoutPlanView
                                 disabled
                               >
                                 <Lock className="w-3.5 h-3.5" />
-                                Premium only
+                                Start
                               </Button>
                             ) : (
                               <Button 
