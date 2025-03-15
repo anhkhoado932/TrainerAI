@@ -49,7 +49,7 @@ export default function RecordPage({ params }: RecordPageProps) {
   const countdownRef = useRef<NodeJS.Timeout | null>(null)
   const processingTimerRef = useRef<NodeJS.Timeout | null>(null)
   
-  const MAX_RECORDING_TIME = 9 // 5 seconds
+  const MAX_RECORDING_TIME = 5 // 5 seconds
   
   const [selectedCamera, setSelectedCamera] = useState<string | null>(null)
   const [availableCameras, setAvailableCameras] = useState<MediaDeviceInfo[]>([])
@@ -221,15 +221,25 @@ export default function RecordPage({ params }: RecordPageProps) {
       setCountdownValue((prev) => {
         const newValue = prev - 1
         if (newValue <= 0) {
-          // When countdown reaches 0, start recording
+          // When countdown reaches 0, clear interval and start recording
           clearInterval(countdownRef.current!)
-          startRecording()
+          // Don't call startRecording here, it will be called in the useEffect
+          setIsCountingDown(false) // This will trigger the useEffect
           return 0
         }
         return newValue
       })
     }, 1000)
   }
+
+  // Add useEffect to handle transition from countdown to recording
+  useEffect(() => {
+    // When countdown finishes (reaches 0 and isCountingDown becomes false)
+    // Start recording if we just finished counting down
+    if (!isCountingDown && countdownValue === 0 && !isRecording && !hasRecorded) {
+      startRecording()
+    }
+  }, [isCountingDown, countdownValue, isRecording, hasRecorded])
 
   const startRecording = async () => {
     setIsCountingDown(false)
