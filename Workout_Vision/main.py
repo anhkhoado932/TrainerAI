@@ -266,6 +266,15 @@ def custom_monitor(ai_gym, frame) -> Tuple[np.ndarray, float]:
         for ind, k in enumerate(reversed(tracks.keypoints.data)):
             kpts = [k[int(ai_gym.kpts[i])].cpu() for i in range(3)]
             ai_gym.angle[ind] = ai_gym.annotator.estimate_pose_angle(*kpts)
+            
+            # Draw lines connecting the 3 keypoints
+            im0 = ai_gym.annotator.draw_specific_points(k, ai_gym.kpts, radius=ai_gym.line_width * 2)
+            
+            # Manually draw white lines connecting the keypoints
+            for i in range(len(ai_gym.kpts) - 1):
+                pt1 = (int(k[int(ai_gym.kpts[i])][0]), int(k[int(ai_gym.kpts[i])][1]))
+                pt2 = (int(k[int(ai_gym.kpts[i+1])][0]), int(k[int(ai_gym.kpts[i+1])][1]))
+                cv2.line(frame, pt1, pt2, (255, 255, 255), thickness=ai_gym.line_width)
 
             if min_knee_angle is None or ai_gym.angle[ind] < min_knee_angle:
                 min_knee_angle = ai_gym.angle[ind]
@@ -276,9 +285,9 @@ def custom_monitor(ai_gym, frame) -> Tuple[np.ndarray, float]:
             else:
                 ai_gym.stage[ind] = 'normal'
                 color = config.NORMAL_COLOR
-
-            x, y = int(k[14][0]), int(k[14][1])
-            cv2.circle(frame, (x + config.CIRCLE_OFFSET_X, y), config.CIRCLE_RADIUS, color, config.CIRCLE_THICKNESS)
+            
+            # x, y = int(k[14][0]), int(k[14][1])
+            # cv2.circle(frame, (x + config.CIRCLE_OFFSET_X, y), config.CIRCLE_RADIUS, color, config.CIRCLE_THICKNESS)
 
     return frame, (min_knee_angle if min_knee_angle is not None else 180)
 

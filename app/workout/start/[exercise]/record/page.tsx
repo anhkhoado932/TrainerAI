@@ -22,7 +22,7 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
 const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // Felix backend URL
-const FELIX_BACKEND_URL = "http://ec2-3-87-161-127.compute-1.amazonaws.com/analyze"
+const FELIX_BACKEND_URL = "http://localhost:8000/analyze"
 
 export default function RecordPage({ params }: RecordPageProps) {
   const router = useRouter()
@@ -49,7 +49,10 @@ export default function RecordPage({ params }: RecordPageProps) {
   const countdownRef = useRef<NodeJS.Timeout | null>(null)
   const processingTimerRef = useRef<NodeJS.Timeout | null>(null)
   
-  const MAX_RECORDING_TIME = 5 // 5 seconds
+  const MAX_RECORDING_TIME = 9 // 5 seconds
+  
+  const [selectedCamera, setSelectedCamera] = useState<string | null>(null)
+  const [availableCameras, setAvailableCameras] = useState<MediaDeviceInfo[]>([])
   
   // Format the exercise name for display (convert from URL format)
   const exerciseName = exercise
@@ -88,23 +91,72 @@ export default function RecordPage({ params }: RecordPageProps) {
         "Finalizing Result..."
       ]
       
+      const progressValues = [25, 50, 75, 100] // YOLO analysis takes 60% (from 10% to 70%)
+      
       let currentStepIndex = 0
       setProcessingStep(steps[currentStepIndex])
-      setProcessingProgress(25)
+      setProcessingProgress(progressValues[currentStepIndex])
       
-      processingTimerRef.current = setInterval(() => {
-        currentStepIndex = (currentStepIndex + 1) % steps.length
-        setProcessingStep(steps[currentStepIndex])
-        setProcessingProgress((currentStepIndex + 1) * 25)
-      }, 2000) // Change step every 2 seconds
+      // Set up a sequence of timeouts for each step, with YOLO taking longer
+      const stepDurations = [1500, 6000, 2000, null] // Last step has no duration (stays there)
+      
+      const runNextStep = (index: number) => {
+        if (index >= steps.length) return
+        
+        setProcessingStep(steps[index])
+        setProcessingProgress(progressValues[index])
+        
+        // Only proceed to next step if not at the final step and duration is set
+        if (index < steps.length - 1 && stepDurations[index] !== null) {
+          processingTimerRef.current = setTimeout(() => {
+            runNextStep(index + 1)
+          }, stepDurations[index] as number) as unknown as NodeJS.Timeout
+        }
+      }
+      
+      // Start the sequence
+      runNextStep(0)
       
       return () => {
         if (processingTimerRef.current) {
-          clearInterval(processingTimerRef.current)
+          clearTimeout(processingTimerRef.current)
         }
       }
     }
   }, [isUploading, isProcessing, exerciseName])
+
+  // Get available camera devices
+  const getAvailableCameras = async () => {
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices()
+      const videoDevices = devices.filter(device => device.kind === 'videoinput')
+      setAvailableCameras(videoDevices)
+      
+      // Look for Camo or other virtual cameras
+      const camoDevice = videoDevices.find(device => 
+        device.label.toLowerCase().includes('camo') || 
+        device.label.toLowerCase().includes('virtual')
+      )
+      console.log("videoDevices:", videoDevices)
+      // If Camo is found, select it by default
+      if (camoDevice) {
+        setSelectedCamera(camoDevice.deviceId)
+      } else if (videoDevices.length > 0) {
+        // Otherwise select the first camera
+        setSelectedCamera(videoDevices[0].deviceId)
+      }
+      
+      return videoDevices
+    } catch (error) {
+      console.error("Error enumerating devices:", error)
+      return []
+    }
+  }
+  
+  // Load available cameras when component mounts
+  useEffect(() => {
+    getAvailableCameras()
+  }, [])
 
   const setupCamera = async () => {
     try {
@@ -113,9 +165,20 @@ export default function RecordPage({ params }: RecordPageProps) {
         streamRef.current.getTracks().forEach(track => track.stop())
       }
       
+      // Prepare video constraints
+      const videoConstraints: MediaTrackConstraints = {
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      }
+      
+      // If a specific camera is selected, use its deviceId
+      if (selectedCamera) {
+        videoConstraints.deviceId = { exact: selectedCamera }
+      }
+      
       // Get user media with video and audio
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
+        video: videoConstraints,
         audio: true
       })
       
@@ -130,6 +193,15 @@ export default function RecordPage({ params }: RecordPageProps) {
     } catch (error) {
       console.error("Error accessing camera:", error)
       return false
+    }
+  }
+
+  // Handle camera selection change
+  const handleCameraChange = (deviceId: string) => {
+    setSelectedCamera(deviceId)
+    // If we already have the preview open, update it with the new camera
+    if (videoRef.current && videoRef.current.srcObject) {
+      setupCamera()
     }
   }
 
@@ -365,7 +437,7 @@ export default function RecordPage({ params }: RecordPageProps) {
       setIsUploading(false)
       setIsProcessing(false)
       if (processingTimerRef.current) {
-        clearInterval(processingTimerRef.current)
+        clearTimeout(processingTimerRef.current)
       }
     }
   }
@@ -393,6 +465,27 @@ export default function RecordPage({ params }: RecordPageProps) {
                 <span>{processingProgress}%</span>
               </div>
               <Progress value={processingProgress} className="h-2" />
+            </div>
+          )}
+          
+          {/* Camera selection dropdown */}
+          {!isRecording && !isCountingDown && !isUploading && !isProcessing && availableCameras.length > 1 && (
+            <div className="mt-4">
+              <label htmlFor="camera-select" className="block text-sm font-medium mb-1">
+                Select Camera
+              </label>
+              <select
+                id="camera-select"
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                value={selectedCamera || ''}
+                onChange={(e) => handleCameraChange(e.target.value)}
+              >
+                {availableCameras.map((device) => (
+                  <option key={device.deviceId} value={device.deviceId}>
+                    {device.label || `Camera ${availableCameras.indexOf(device) + 1}`}
+                  </option>
+                ))}
+              </select>
             </div>
           )}
         </CardHeader>
