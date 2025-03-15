@@ -9,6 +9,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { toast } from "sonner"
 import OpenAI from 'openai'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 
 interface Question {
   id: string
@@ -139,7 +140,7 @@ function LoadingScreen({ onComplete }: { onComplete: () => void }) {
           clearInterval(stepInterval)
           setTimeout(() => {
             setIsFinishing(true)
-            setTimeout(onComplete, 1000) // Wait for fade out animation
+            setTimeout(onComplete, 1000)
           }, 1000)
           return prev
         }
@@ -174,10 +175,10 @@ function LoadingScreen({ onComplete }: { onComplete: () => void }) {
               <motion.div 
                 className={`w-2 h-2 rounded-full ${
                   index === currentStep 
-                    ? 'bg-green-500' 
+                    ? 'bg-[#F26430]' 
                     : index < currentStep 
-                    ? 'bg-green-700' 
-                    : 'bg-neutral-600'
+                    ? 'bg-[#F26430]/70' 
+                    : 'bg-neutral-300'
                 }`}
                 animate={{
                   scale: index === currentStep ? [1, 1.2, 1] : 1
@@ -186,10 +187,10 @@ function LoadingScreen({ onComplete }: { onComplete: () => void }) {
               />
               <span className={
                 index === currentStep 
-                  ? 'text-white' 
+                  ? 'text-neutral-900' 
                   : index < currentStep 
-                  ? 'text-neutral-400' 
-                  : 'text-neutral-600'
+                  ? 'text-neutral-600' 
+                  : 'text-neutral-400'
               }>
                 {step.text}
               </span>
@@ -201,7 +202,7 @@ function LoadingScreen({ onComplete }: { onComplete: () => void }) {
         className="flex justify-center"
         animate={{ opacity: isFinishing ? 0 : 1 }}
       >
-        <Loader2 className="w-6 h-6 animate-spin text-neutral-400" />
+        <Loader2 className="w-6 h-6 animate-spin text-[#F26430]" />
       </motion.div>
     </motion.div>
   )
@@ -218,6 +219,7 @@ export function AssessmentForm() {
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [isCompleted, setIsCompleted] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
 
   const currentQuestion = questions[currentStep]
   const progress = ((currentStep + 1) / questions.length) * 100
@@ -304,6 +306,12 @@ export function AssessmentForm() {
       toast.success('Assessment saved successfully!', {
         description: 'Your personalized workout plan has been generated.'
       })
+
+      // Add a slight delay for better UX
+      setTimeout(() => {
+        handleComplete()
+      }, 1500) // Give time for the success message to be seen
+
     } catch (error) {
       console.error('Error saving assessment:', error)
       toast.error('Failed to save assessment', {
@@ -326,10 +334,23 @@ export function AssessmentForm() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-black text-white">
+    <div className="min-h-screen flex flex-col relative">
+      {/* Background Image with Gradient Overlay */}
+      <div className="fixed inset-0 -z-10">
+        <Image
+          src="/bg-pattern.jpg"
+          alt="Background Pattern"
+          fill
+          className="object-cover"
+          priority
+          quality={100}
+        />
+        <div className="absolute inset-0 bg-white/60" />
+      </div>
+
       {/* Progress bar */}
       <div className="fixed top-0 left-0 right-0 z-50">
-        <Progress value={progress} className="rounded-none bg-neutral-800" />
+        <Progress value={progress} className="rounded-none bg-neutral-200" />
       </div>
 
       {/* Back button - Fixed position */}
@@ -340,7 +361,7 @@ export function AssessmentForm() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             onClick={handleBack}
-            className="fixed top-8 left-8 flex items-center text-gray-400 hover:text-white transition-colors"
+            className="fixed top-8 left-8 flex items-center text-neutral-600 hover:text-neutral-900 transition-colors"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
             Back
@@ -361,7 +382,7 @@ export function AssessmentForm() {
                 transition={{ duration: 0.3 }}
                 className="space-y-8"
               >
-                <h1 className="text-4xl font-bold text-center mb-12">
+                <h1 className="text-4xl font-bold text-center mb-12 text-neutral-900">
                   {currentQuestion.title}
                 </h1>
 
@@ -376,7 +397,7 @@ export function AssessmentForm() {
                     >
                       <Button
                         variant="outline"
-                        className="w-full p-6 h-auto flex items-center text-left text-white hover:bg-white/10 border-neutral-800 hover:border-neutral-700 transition-colors"
+                        className="w-full p-6 h-auto flex items-center text-left bg-white/80 hover:bg-white/90 text-neutral-800 border border-neutral-200 hover:border-neutral-300 transition-colors backdrop-blur-sm"
                         onClick={() => handleOptionSelect(option.value)}
                       >
                         {option.icon && (
@@ -389,38 +410,57 @@ export function AssessmentForm() {
                 </div>
               </motion.div>
             ) : (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="space-y-8 text-center"
-              >
-                {isLoading ? (
+              isLoading ? (
+                <div className="bg-white/80 p-8 rounded-lg backdrop-blur-sm">
                   <LoadingScreen onComplete={handleComplete} />
-                ) : (
-                  <>
-                    <h2 className="text-4xl font-bold">Assessment Complete!</h2>
-                    <p className="text-neutral-400">
-                      Ready to get your personalized workout plan?
-                    </p>
-                    <Button
-                      size="lg"
-                      className="w-full py-8 text-lg"
-                      onClick={handleSaveAssessment}
-                      disabled={isLoading}
-                    >
-                      Save & Continue
-                    </Button>
-                  </>
-                )}
-              </motion.div>
+                </div>
+              ) : isSuccess ? (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-center space-y-6 bg-white/80 p-8 rounded-lg backdrop-blur-sm"
+                >
+                  <div className="text-6xl">🎉</div>
+                  <h2 className="text-4xl font-bold text-neutral-900">All Set!</h2>
+                  <p className="text-neutral-600">
+                    Your personalized workout plan is ready
+                  </p>
+                  <Button
+                    size="lg"
+                    className="w-full bg-[#F26430] hover:bg-[#F26430]/90 text-white"
+                    onClick={handleComplete}
+                  >
+                    View Your Workout Plan
+                  </Button>
+                </motion.div>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="space-y-8 text-center bg-white/80 p-8 rounded-lg backdrop-blur-sm"
+                >
+                  <h2 className="text-4xl font-bold text-neutral-900">Assessment Complete!</h2>
+                  <p className="text-neutral-600">
+                    Ready to get your personalized workout plan?
+                  </p>
+                  <Button
+                    size="lg"
+                    className="w-full py-8 text-lg bg-[#F26430] hover:bg-[#F26430]/90 text-white"
+                    onClick={handleSaveAssessment}
+                    disabled={isLoading}
+                  >
+                    Save & Continue
+                  </Button>
+                </motion.div>
+              )
             )}
           </AnimatePresence>
 
           {/* Step indicator */}
           {!isCompleted && (
             <motion.div 
-              className="text-center text-sm text-neutral-500 mt-8"
+              className="text-center text-sm text-neutral-600 mt-8"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
