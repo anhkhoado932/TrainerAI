@@ -22,7 +22,7 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
 const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // Felix backend URL
-const FELIX_BACKEND_URL = process.env.FELIX_BACKEND_URL || "http://localhost:8000/analyze"
+const FELIX_BACKEND_URL = "http://ec2-3-87-161-127.compute-1.amazonaws.com/analyze"
 
 export default function RecordPage({ params }: RecordPageProps) {
   const router = useRouter()

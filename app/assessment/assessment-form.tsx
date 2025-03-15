@@ -236,7 +236,7 @@ export function AssessmentForm() {
   }
 
   const generateWorkoutPlan = async (assessment: Record<string, string>): Promise<WorkoutPlan> => {
-    const prompt = `Generate a personalized workout (with squat as the first exercise in every workout plan) based on the following assessment:
+    const prompt = `Generate a personalized workout (with exactly "squat" as the first exercise in every workout plan) based on the following assessment:
     ${JSON.stringify(assessment, null, 2)}
     
     Respond with a JSON object in this exact format:
