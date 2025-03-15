@@ -11,38 +11,38 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 0 0% 0%;
+    --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 0%;
+    --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 0%;
-    --primary: 14 88% 57%;  /* #F26430 */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 14 88% 97%;  /* Lighter version of #F26430 */
-    --secondary-foreground: 14 88% 57%;
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 40%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 14 88% 57%;  /* #F26430 - your orange */
+    --primary-foreground: 0 0% 100%;  /* white */
+    --secondary: 0 0% 98%;  /* very light gray */
+    --secondary-foreground: 14 88% 57%;  /* #F26430 */
+    --muted: 0 0% 98%;
+    --muted-foreground: 0 0% 45%;
     --accent: 14 88% 57%;  /* #F26430 */
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 0%;
-    --input: 0 0% 0%;
-    --ring: 0 0% 0%;
+    --border: 220 13% 91%;  /* light gray for borders */
+    --input: 220 13% 91%;
+    --ring: 14 88% 57%;  /* #F26430 */
+    --radius: 0.5rem;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 240 10% 3.9%;
+    --sidebar-primary: 14 88% 57%;  /* #F26430 */
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 98%;
+    --sidebar-accent-foreground: 240 10% 3.9%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 14 88% 57%;  /* #F26430 */
     --chart-1: 0 0% 0%;
     --chart-2: 0 0% 20%;
     --chart-3: 0 0% 40%;
     --chart-4: 0 0% 60%;
     --chart-5: 0 0% 80%;
-    --radius: 0.5rem;
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 0 0% 0%;
-    --sidebar-primary: 0 0% 0%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 96%;
-    --sidebar-accent-foreground: 0 0% 0%;
-    --sidebar-border: 0 0% 0%;
-    --sidebar-ring: 0 0% 0%;
   }
 
   .dark {
