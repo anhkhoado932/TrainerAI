@@ -65,116 +65,124 @@ export default async function HomePage() {
       </header>
       
       <main className="flex-grow relative z-10">
-        <section className="relative py-24 lg:py-28 overflow-hidden">
-          <div className="container mx-auto px-4 text-center relative z-10">
-            <div className="animate-fade-in">
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 text-black">
-                PT<span className="text-[#F26430]">+</span>
-              </h1>
-              <p className="text-2xl md:text-3xl font-medium text-[#F26430] mb-6">
-                Your Personal AI Fitness Companion
-              </p>
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-10">
-                Personalized workout plans, real-time form correction, and adaptive training - all powered by AI.
-              </p>
-              <div className="flex flex-col sm:flex-row justify-center gap-6">
-                <Button 
-                  size="lg" 
-                  className="w-full sm:w-auto px-8 py-6 text-lg rounded-xl hover:scale-105 transition-transform bg-[#F26430] text-white hover:bg-[#F26430]/90"
-                  asChild
-                >
-                  <Link href="/dashboard">
-                    Get Started
-                  </Link>
-                </Button>
-                <Button 
-                  size="lg" 
-                  variant="outline" 
-                  className="w-full sm:w-auto px-8 py-6 text-lg rounded-xl border-2 border-[#F26430] text-[#F26430] hover:bg-[#F26430]/10 hover:scale-105 transition-transform"
-                  asChild
-                >
-                  <a href="#features">
-                    Learn More
-                  </a>
-                </Button>
+        {/* Combined Hero, Features, and Image Section */}
+        <section className="min-h-[calc(100vh-73px-88px)] relative overflow-hidden pb-24"> {/* Added min-height and padding-bottom */}
+          <div className="container mx-auto px-4 h-full relative z-10">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 h-full items-center pt-16"> {/* Added padding-top */}
+              {/* Left Side Content */}
+              <div className="space-y-16">
+                {/* Hero Content */}
+                <div className="space-y-8">
+                  <h1 className="text-5xl md:text-6xl font-bold text-black">
+                    PT<span className="text-[#F26430]">+</span>
+                  </h1>
+                  <p className="text-2xl font-medium text-[#F26430]">
+                    Your AI-Powered Personal Trainer
+                  </p>
+                  <p className="text-lg text-gray-600 max-w-xl">
+                    Achieve your fitness goals with smart, adaptive workout plans, real-time form correction, and 
+                    AI-driven coaching—designed just for you.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                    <Button 
+                      size="lg" 
+                      className="w-full sm:w-auto px-6 py-5 text-base rounded-xl hover:scale-105 transition-transform bg-[#F26430] text-white hover:bg-[#F26430]/90"
+                      asChild
+                    >
+                      <Link href="/dashboard">
+                        Get Started
+                      </Link>
+                    </Button>
+                    <Button 
+                      size="lg" 
+                      variant="outline" 
+                      className="w-full sm:w-auto px-6 py-5 text-base rounded-xl border-2 border-[#F26430] text-[#F26430] bg-white hover:bg-[#F26430]/10 hover:scale-105 transition-transform"
+                      asChild
+                    >
+                      <a href="#features">
+                        Learn More
+                      </a>
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Features */}
+                <div className="space-y-8">
+                  <h2 className="text-2xl font-bold text-black">
+                    A New Standard of Fitness,<br />On Your Terms
+                  </h2>
+                  <div className="space-y-6">
+                    {[
+                      {
+                        title: "Smart Workout Plans",
+                        description: "AI-driven fitness programs designed to match your goals and progress.",
+                        icon: "💡"
+                      },
+                      {
+                        title: "Form Analysis",
+                        description: "Get real-time feedback on your exercise form to prevent injuries and maximize performance",
+                        icon: "📊"
+                      },
+                      {
+                        title: "Progress Tracking",
+                        description: "Stay on top of your fitness journey with insightful analytics and milestone tracking",
+                        icon: "📈"
+                      }
+                    ].map((feature, index) => (
+                      <div 
+                        key={index}
+                        className="flex items-start space-x-4 bg-white/50 p-6 rounded-xl hover:bg-white/80 transition-all duration-300"
+                      >
+                        <div className="text-3xl">
+                          {feature.icon}
+                        </div>
+                        <div className="space-y-2">
+                          <h3 className="text-lg font-semibold text-black">
+                            {feature.title}
+                          </h3>
+                          <p className="text-sm text-gray-600">
+                            {feature.description}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Side - Image */}
+              <div className="relative h-full hidden lg:block">
+                <div className="absolute right-[-200px] bottom-[-20px] w-[900px] h-[1100px]"> {/* Adjusted size and position */}
+                  <Image
+                    src="/hand.png"
+                    alt="Fitness Training"
+                    fill
+                    className="object-contain object-bottom"
+                    style={{
+                      transform: "translateY(0) rotate(5deg)", /* Removed translateY */
+                      filter: "contrast(1.1)"
+                    }}
+                    priority
+                    quality={100}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-white/20 via-transparent to-transparent" />
+                </div>
               </div>
             </div>
           </div>
-          {/* Updated blur effect */}
+          
+          {/* Background Elements */}
           <div className="absolute inset-0 opacity-30">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#F26430]/20 rounded-full blur-3xl" />
-          </div>
-        </section>
-        
-        <section id="features" className="py-3 relative">
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-10 text-black">
-              Key Features
-            </h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              {[
-                {
-                  title: "Smart Workout Plans",
-                  description: "AI-generated workout plans tailored to your fitness level, goals, and available equipment.",
-                  icon: "🎯"
-                },
-                {
-                  title: "Form Analysis",
-                  description: "Real-time feedback on your exercise form to prevent injuries and maximize results.",
-                  icon: "📊"
-                },
-                {
-                  title: "Progress Tracking",
-                  description: "Detailed analytics and insights to track your fitness journey and celebrate milestones.",
-                  icon: "📈"
-                }
-              ].map((feature, index) => (
-                <Card 
-                  key={index} 
-                  className="border-gray-200 bg-white hover:shadow-[#F26430]/10 hover:border-[#F26430]/30 transition-all duration-300"
-                >
-                  <CardHeader>
-                    <div className="text-4xl mb-4">{feature.icon}</div>
-                    <CardTitle className="text-xl text-black hover:text-[#F26430] transition-colors">
-                      {feature.title}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription className="text-gray-600">
-                      {feature.description}
-                    </CardDescription>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="py-16 bg-[#F26430]/5 backdrop-blur-sm">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-2xl font-semibold mb-8 text-black">Trusted by Fitness Enthusiasts</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              {['1000+', '95%', '50+', '24/7'].map((stat, index) => (
-                <div key={index} className="p-4">
-                  <div className="text-3xl font-bold text-[#F26430] mb-2">{stat}</div>
-                  <div className="text-sm text-gray-600">
-                    {index === 0 && 'Active Users'}
-                    {index === 1 && 'Satisfaction Rate'}
-                    {index === 2 && 'Exercise Types'}
-                    {index === 3 && 'AI Support'}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <div className="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#F26430]/20 rounded-full blur-3xl" />
           </div>
         </section>
       </main>
       
-      <footer className="bg-white/80 backdrop-blur-sm py-8 border-t border-gray-200 relative z-10">
+      <footer className="bg-white/80 backdrop-blur-sm py-6 border-t border-gray-200 relative z-10"> {/* Reduced footer padding */}
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-4 md:mb-0">
-              <div className="font-bold text-xl mb-2 text-black">PT+</div>
+              <div className="font-bold text-xl mb-2 text-black">PT<span className="text-[#F26430]">+</span></div>
               <p className="text-gray-600">Your Personal AI Fitness Companion</p>
             </div>
             <div className="flex space-x-4">
