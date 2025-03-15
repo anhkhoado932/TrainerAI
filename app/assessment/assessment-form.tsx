@@ -307,8 +307,11 @@ export function AssessmentForm() {
         description: 'Your personalized workout plan has been generated.'
       })
 
+      setIsSuccess(true)
+      
       // Add a slight delay for better UX
       setTimeout(() => {
+        setIsLoading(false)
         handleComplete()
       }, 1500) // Give time for the success message to be seen
 
@@ -412,7 +415,7 @@ export function AssessmentForm() {
             ) : (
               isLoading ? (
                 <div className="bg-white/80 p-8 rounded-lg backdrop-blur-sm">
-                  <LoadingScreen onComplete={handleComplete} />
+                  <LoadingScreen onComplete={() => {}} />
                 </div>
               ) : isSuccess ? (
                 <motion.div
