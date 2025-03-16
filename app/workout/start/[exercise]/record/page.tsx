@@ -9,24 +9,24 @@ import { Progress } from "@/components/ui/progress"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import { use } from "react"
 
-// interface RecordPageProps {
-//   params: {
-//     exercise: string
-//   }
-//   searchParams: { [key: string]: string | string[] | undefined }
-// }
+interface PageProps {
+  params: Promise<{
+    exercise: string
+  }>
+}
 
 // Initialize Supabase client
 // // const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // Felix backend URL
-const FELIX_BACKEND_URL = "http://localhost:8000/analyze"
+const FELIX_BACKEND_URL = process.env.NEXT_PUBLIC_FELIX_BACKEND_URL || "http://localhost:8000/analyze"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function RecordPage({ params }: any) {
+export default function RecordPage({ params }: PageProps) {
   const router = useRouter()
-  const { exercise } = params
+  const { exercise } = use(params)
   const supabase = createClientComponentClient()
   
   const [isRecording, setIsRecording] = useState(false)
