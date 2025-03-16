@@ -1,30 +1,41 @@
 "use client"
 
-import { useState, useEffect, use } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { ArrowLeft, ChevronRight, Plus, Minus, RotateCcw, CheckCircle, Timer, Dumbbell, Clock } from "lucide-react"
+import { ArrowLeft, ChevronRight, CheckCircle, Timer, Dumbbell, Clock } from "lucide-react"
 import Link from "next/link"
 import { Progress } from "@/components/ui/progress"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import { useSearchParams } from "next/navigation"
 
 interface TrackingPageProps {
-  params: Promise<{
+  params: {
     exercise: string
-  }>
+  }
+  searchParams: { [key: string]: string | string[] | undefined }
 }
 
 // Exercise data structure from assessment form
 interface ExerciseData {
   name: string
   sets: number
-  "set-durations"?: number // in seconds
+  "set-durations": number // in seconds
   rest: number
   notes?: string
+}
+
+interface WorkoutDay {
+  exercises: ExerciseData[];
+}
+
+// Define type for workout plan data
+interface WorkoutPlanData {
+  weeklySchedule: {
+    [key: string]: WorkoutDay;
+  };
 }
 
 // Default recommended sets and reps for different exercises
@@ -83,9 +94,7 @@ const EXERCISE_DEFAULTS: Record<string, ExerciseData> = {
 
 export default function TrackingPage({ params }: TrackingPageProps) {
   const router = useRouter()
-  const unwrappedParams = use(params)
-  const { exercise } = unwrappedParams
-  const searchParams = useSearchParams()
+  const { exercise } = params
   const supabase = createClientComponentClient()
   
   // Get exercise data from URL params or use defaults
@@ -123,29 +132,24 @@ export default function TrackingPage({ params }: TrackingPageProps) {
             
           if (workoutPlan?.plan) {
             // Search for the exercise in the workout plan
-            const plan = workoutPlan.plan
+            const plan = workoutPlan.plan as WorkoutPlanData
             let foundExercise: ExerciseData | null = null
             
             // Look through each day in the weekly schedule
-            Object.values(plan.weeklySchedule || {}).forEach((day: any) => {
-              const exercises = day.exercises || []
-              const match = exercises.find((ex: any) => 
+            Object.values(plan.weeklySchedule || {}).forEach((day: WorkoutDay) => {
+              const exercises: ExerciseData[] = day.exercises || []
+              const match = exercises.find(ex => 
                 ex.name.toLowerCase() === exerciseName.toLowerCase()
               )
               if (match) {
-                foundExercise = {
-                  name: match.name,
-                  sets: match.sets,
-                  "set-durations": match["set-durations"] || 45, // Default to 45 seconds if not specified
-                  rest: typeof match.rest === 'string' ? parseInt(match.rest) || 60 : match.rest || 60,
-                  notes: match.notes
-                }
+                foundExercise = match
               }
             })
             
             if (foundExercise) {
               setExerciseData(foundExercise)
               setSetTimeRemaining(foundExercise["set-durations"] || 45)
+              // @ts-expect-error Rest property is defined in ExerciseData interface
               setRestTimeRemaining(foundExercise.rest)
               setLoading(false)
               return
@@ -187,7 +191,41 @@ export default function TrackingPage({ params }: TrackingPageProps) {
     loadExerciseData()
   }, [exercise, exerciseName, supabase])
 
-  // Handle set timer
+  // Complete the current set (wrapped in useCallback)
+  const completeSet = useCallback(() => {
+    if (currentSet < (exerciseData?.sets || 3)) {
+      setCurrentSet(prev => prev + 1);
+      setCompletedSets(prev => [...prev, setTimeRemaining]);
+      toast.success(`Set ${currentSet} completed! Rest for ${formatTime(restTimeRemaining)}`);
+    } else {
+      // All sets completed
+      setWorkoutComplete(true);
+      toast.success("Workout complete! Great job!");
+    }
+  }, [currentSet, exerciseData?.sets, setTimeRemaining, restTimeRemaining]);
+
+  // Start the current set
+  const startSet = () => {
+    setIsPerformingSet(true);
+    toast.info(`Set ${currentSet} started! Keep going for ${formatTime(setTimeRemaining)}`);
+  };
+
+  // Skip the current set
+  const skipSet = () => {
+    setIsPerformingSet(false);
+    setIsResting(false);
+    completeSet();
+    toast.info("Set skipped");
+  };
+
+  // Format seconds to MM:SS
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  };
+
+  // Handle exercise timer
   useEffect(() => {
     let timer: NodeJS.Timeout | null = null;
     
@@ -196,7 +234,9 @@ export default function TrackingPage({ params }: TrackingPageProps) {
         setSetTimeRemaining(prev => {
           if (prev <= 1) {
             // Set is complete
+            clearInterval(timer as NodeJS.Timeout);
             setIsPerformingSet(false);
+            setIsResting(true);
             completeSet();
             return exerciseData?.["set-durations"] || 45; // Reset for next set
           }
@@ -208,7 +248,7 @@ export default function TrackingPage({ params }: TrackingPageProps) {
     return () => {
       if (timer) clearInterval(timer);
     };
-  }, [isPerformingSet, setTimeRemaining, exerciseData]);
+  }, [isPerformingSet, setTimeRemaining, exerciseData, completeSet]);
 
   // Handle rest timer
   useEffect(() => {
@@ -232,48 +272,6 @@ export default function TrackingPage({ params }: TrackingPageProps) {
       if (timer) clearInterval(timer);
     };
   }, [isResting, restTimeRemaining, exerciseData]);
-
-  // Start the current set
-  const startSet = () => {
-    setIsPerformingSet(true);
-    toast.info(`Set ${currentSet} started! Keep going for ${formatTime(setTimeRemaining)}`);
-  };
-
-  // Complete current set
-  const completeSet = () => {
-    // Add current set to completed sets with the duration performed
-    setCompletedSets(prev => [...prev, setTimeRemaining]);
-    
-    // Check if all sets are completed
-    if (currentSet >= (exerciseData?.sets || 3)) {
-      setWorkoutComplete(true);
-      setIsPerformingSet(false);
-      toast.success("Workout completed! Great job!");
-      return;
-    }
-    
-    // Move to next set
-    setCurrentSet(prev => prev + 1);
-    setIsPerformingSet(false);
-    setIsResting(true);
-    
-    toast.success(`Set ${currentSet} completed! Rest for ${formatTime(restTimeRemaining)}`);
-  };
-
-  // Skip the current set
-  const skipSet = () => {
-    if (isPerformingSet) {
-      setIsPerformingSet(false);
-      completeSet();
-    }
-  };
-
-  // Format time as MM:SS
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
 
   // Complete workout and return to workout page
   const finishWorkout = () => {
@@ -332,7 +330,7 @@ export default function TrackingPage({ params }: TrackingPageProps) {
               <CheckCircle className="w-16 h-16 text-[#F26430] mx-auto mb-4" />
               <h3 className="text-2xl font-bold mb-2">Workout Complete!</h3>
               <p className="text-muted-foreground mb-6">
-                You've completed all {exerciseData?.sets || 3} sets of {exerciseName}. Great job!
+                You&apos;ve completed all {exerciseData?.sets || 3} sets of {exerciseName}. Great job!
               </p>
               <Button 
                 className="bg-[#F26430] hover:bg-[#F26430]/90"

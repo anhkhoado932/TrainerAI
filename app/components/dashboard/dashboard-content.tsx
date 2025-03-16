@@ -37,7 +37,6 @@ export function DashboardContent({ hasAssessment, hasWorkoutPlan }: DashboardCon
         cardRefs.current.forEach((cardRef, index) => {
           if (cardRef) {
             const cardRect = cardRef.getBoundingClientRect();
-            const containerRect = containerRef.current!.getBoundingClientRect();
             
             // Calculate relative position within the card
             const relativeX = e.clientX - cardRect.left;
@@ -113,7 +112,7 @@ export function DashboardContent({ hasAssessment, hasWorkoutPlan }: DashboardCon
               Welcome to Your Fitness Journey
             </h1>
             <p className="text-xl text-gray-600">
-              Let's create your personalized fitness plan with our AI-powered assessment
+              Let&apos;s create your personalized fitness plan with our AI-powered assessment
             </p>
           </div>
 

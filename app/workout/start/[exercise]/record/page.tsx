@@ -1,33 +1,33 @@
 "use client"
 
-import { useState, useRef, useEffect, use } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowLeft, Video, StopCircle, Upload, RefreshCw, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { Progress } from "@/components/ui/progress"
-import { createClient } from "@supabase/supabase-js"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 
-interface RecordPageProps {
-  params: Promise<{
-    exercise: string
-  }>
-}
+// interface RecordPageProps {
+//   params: {
+//     exercise: string
+//   }
+//   searchParams: { [key: string]: string | string[] | undefined }
+// }
 
 // Initialize Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ""
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
-const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// // const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // Felix backend URL
 const FELIX_BACKEND_URL = "http://localhost:8000/analyze"
 
-export default function RecordPage({ params }: RecordPageProps) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default function RecordPage({ params }: any) {
   const router = useRouter()
-  const unwrappedParams = use(params)
-  const { exercise } = unwrappedParams
+  const { exercise } = params
+  const supabase = createClientComponentClient()
   
   const [isRecording, setIsRecording] = useState(false)
   const [hasRecorded, setHasRecorded] = useState(false)
@@ -412,7 +412,7 @@ export default function RecordPage({ params }: RecordPageProps) {
       const filename = `${exercise}-${timestamp}.mp4`
       
       // Upload the video blob to Supabase storage
-      const { data, error } = await supabase.storage
+      const { error } = await supabase.storage
         .from('exercise-demo')
         .upload(filename, videoBlob, {
           contentType: 'video/mp4',

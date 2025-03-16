@@ -1,24 +1,29 @@
 "use client"
 
-import { useState, useEffect, use, useRef } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowLeft, ChevronRight, Info, Award, Volume2, VolumeX } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-import { useSearchParams } from "next/navigation"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
-interface ResultsPageProps {
-  params: Promise<{
-    exercise: string
-  }>
-}
-
-export default function ResultsPage({ params }: ResultsPageProps) {
-  const unwrappedParams = use(params)
-  const { exercise } = unwrappedParams
-  const searchParams = useSearchParams()
+// interface ExerciseResultsProps {
+//   params: {
+//     exercise: string
+//   }
+//   searchParams: {
+//     image_url?: string
+//     summary?: string
+//     audio_url?: string
+//     min_knee_angle?: string
+//     risk_factor?: string
+//     improvements?: string
+//   }
+// }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default function ResultsPage({ params, searchParams }: any) {
+  const { exercise } = params
   
   const [analysisData, setAnalysisData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -26,20 +31,20 @@ export default function ResultsPage({ params }: ResultsPageProps) {
   const [isAudioPlaying, setIsAudioPlaying] = useState(false)
   const audioRef = useRef<HTMLAudioElement>(null)
   
-  // Format the exercise name for display (convert from URL format)
+  // Format the exercise name for display
   const exerciseName = exercise
     .split("-")
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ")
 
   useEffect(() => {
-    // Get the analysis data from URL parameters
-    const imageUrl = searchParams.get('image_url')
-    const summary = searchParams.get('summary')
-    const audioUrl = searchParams.get('audio_url')
-    const minKneeAngle = searchParams.get('min_knee_angle')
-    const riskFactor = searchParams.get('risk_factor')
-    const improvements = searchParams.get('improvements')
+    // Get the analysis data from searchParams
+    const imageUrl = searchParams.image_url
+    const summary = searchParams.summary
+    const audioUrl = searchParams.audio_url
+    const minKneeAngle = searchParams.min_knee_angle
+    const riskFactor = searchParams.risk_factor
+    const improvements = searchParams.improvements
     
     if (imageUrl) {
       setAnalysisData({

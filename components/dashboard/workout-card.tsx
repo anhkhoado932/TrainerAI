@@ -3,8 +3,38 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 
+// Define a proper type for the workout plan
+interface WorkoutPlan {
+  overview: string;
+  weeklySchedule: {
+    [key: string]: {
+      exercises: {
+        name: string;
+        sets: number;
+        reps: string;
+        rest: string;
+        notes?: string;
+      }[];
+      cardio?: {
+        type: string;
+        duration: string;
+        intensity: string;
+      };
+    };
+  };
+  nutrition: {
+    dailyCalories: number;
+    macros: {
+      protein: number;
+      carbs: number;
+      fats: number;
+    };
+    recommendations: string[];
+  };
+}
+
 interface WorkoutCardProps {
-  workoutPlan: any // Using the same WorkoutPlan type from workout-plan-view
+  workoutPlan: WorkoutPlan | null;
 }
 
 export function WorkoutCard({ workoutPlan }: WorkoutCardProps) {

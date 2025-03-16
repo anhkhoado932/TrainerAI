@@ -10,9 +10,13 @@ interface VideoPageProps {
   }
 }
 
-export default function VideoPage({ params }: VideoPageProps) {
+// Convert to an async function to properly handle params
+export default async function VideoPage({ params }: VideoPageProps) {
+  // Ensure params is properly awaited
+  const exercise = params.exercise
+
   // Format the exercise name for display (convert from URL format)
-  const exerciseName = params.exercise
+  const exerciseName = exercise
     .split("-")
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ")
@@ -49,13 +53,13 @@ export default function VideoPage({ params }: VideoPageProps) {
         </CardContent>
         <CardFooter className="flex justify-between">
           <Button variant="outline" asChild>
-            <Link href={`/workout/start/${params.exercise}`}>
+            <Link href={`/workout/start/${exercise}`}>
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back
             </Link>
           </Button>
           <Button className="bg-[#F26430] hover:bg-[#F26430]/90 flex items-center gap-2" asChild>
-            <Link href={`/workout/start/${params.exercise}/record`}>
+            <Link href={`/workout/start/${exercise}/record`}>
               <Video className="h-4 w-4" />
               Record Your Demo
             </Link>

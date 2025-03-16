@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { ChevronRight, Dumbbell, Heart, Lock, Play, Timer } from "lucide-react"
+import { Dumbbell, Heart, Lock, Play, Timer } from "lucide-react"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 

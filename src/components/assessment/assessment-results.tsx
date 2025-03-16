@@ -7,6 +7,7 @@ import { Icons } from "@/components/ui/icons"
 
 interface AssessmentResultsProps {
   assessment: Record<string, string>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   workoutPlan: any // Using any here since the workout plan structure is complex
 }
 
@@ -20,13 +21,13 @@ const ASSESSMENT_LABELS: Record<string, string> = {
   "diet": "Diet Preference"
 }
 
-export function AssessmentResults({ assessment, workoutPlan }: AssessmentResultsProps) {
+export function AssessmentResults({ assessment }: AssessmentResultsProps) {
   return (
     <div className="container max-w-4xl py-8 space-y-8">
       <div className="text-center space-y-4">
         <h1 className="text-4xl font-bold text-foreground">Your Assessment Results</h1>
         <p className="text-xl text-muted-foreground">
-          Here's a summary of your fitness profile
+          Here&apos;s a summary of your fitness profile
         </p>
       </div>
 

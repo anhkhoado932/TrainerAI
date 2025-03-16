@@ -3,7 +3,6 @@ import Image from 'next/image'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { SignOutButton } from "@/components/auth/sign-out-button"
@@ -12,7 +11,14 @@ import { Icons } from "@/components/ui/icons"
 export default async function HomePage() {
   const cookieStore = cookies()
   const supabase = createServerComponentClient({ cookies: () => cookieStore })
-  const { data: { session } } = await supabase.auth.getSession()
+  
+  // Get authenticated user data instead of just the session
+  const { data: { user } } = await supabase.auth.getUser()
+  
+  // We don't need to store session since we're not using it
+  if (user) {
+    await supabase.auth.getSession()
+  }
 
   return (
     <div className="flex flex-col min-h-screen relative">
@@ -37,7 +43,7 @@ export default async function HomePage() {
               PT<span className="text-[#F26430]">+</span>
           </div>
           <nav className="flex items-center space-x-4">
-            {session ? (
+            {user ? (
               <>
                 <Link 
                   href="/dashboard" 
@@ -48,7 +54,7 @@ export default async function HomePage() {
                 <SignOutButton variant="ghost" />
                 <Avatar className="h-10 w-10">
                   <AvatarFallback className="bg-[#F26430] text-white text-lg">
-                    {session.user.email?.[0].toUpperCase() || 'U'}
+                    {user.email?.[0].toUpperCase() || 'U'}
                   </AvatarFallback>
                 </Avatar>
               </>

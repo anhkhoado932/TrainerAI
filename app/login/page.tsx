@@ -1,5 +1,6 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -9,7 +10,6 @@ import { z } from 'zod'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../src/components/ui/card"
 import { Input } from "../../src/components/ui/input"
-import { Label } from "../../src/components/ui/label"
 import { Checkbox } from "../../src/components/ui/checkbox"
 import { Alert, AlertDescription } from "../../src/components/ui/alert"
 import { Button } from "../../src/components/ui/button"
@@ -37,7 +37,7 @@ interface AuthError {
   field?: string;
 }
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isLoading, setIsLoading] = useState(false)
@@ -204,5 +204,17 @@ export default function LoginPage() {
         </CardFooter>
       </Card>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen flex-col items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#F26430]"></div>
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
   )
 } 

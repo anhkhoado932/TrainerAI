@@ -3,17 +3,26 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Dumbbell, ChevronRight } from "lucide-react"
 import Link from "next/link"
 
-interface ExerciseStartPageProps {
-  params: {
-    exercise: string
-  }
-}
+// interface ExerciseStartPageProps {
+//   params: {
+//     exercise: string
+//   }
+//   searchParams: {
+//     [key: string]: string | string[] | undefined
+//   }
+// }
 
-export default function ExerciseStartPage({ params }: ExerciseStartPageProps) {
+// Convert to an async function to properly handle params
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default async function ExerciseStartPage({ params }: any) {
+  // Ensure params is properly awaited
+  const { exercise } = params
+  
   // Format the exercise name for display (convert from URL format)
-  const exerciseName = params.exercise
+  const exerciseName = exercise
     .split("-")
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ")
 
   return (
@@ -43,7 +52,7 @@ export default function ExerciseStartPage({ params }: ExerciseStartPageProps) {
             className="w-full bg-[#F26430] hover:bg-[#F26430]/90 flex items-center justify-center gap-2"
             asChild
           >
-            <Link href={`/workout/start/${params.exercise}/video`}>
+            <Link href={`/workout/start/${exercise}/video`}>
               Next
               <ChevronRight className="w-4 h-4" />
             </Link>

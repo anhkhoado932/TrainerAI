@@ -8,7 +8,6 @@ import { Icons } from "@/components/ui/icons"
 
 interface AssessmentResultsProps {
   assessment: Record<string, string>
-  workoutPlan: any // Using any here since the workout plan structure is complex
 }
 
 const ASSESSMENT_LABELS: Record<string, string> = {
@@ -21,7 +20,7 @@ const ASSESSMENT_LABELS: Record<string, string> = {
   "diet": "Diet Preference"
 }
 
-export function AssessmentResults({ assessment, workoutPlan }: AssessmentResultsProps) {
+export function AssessmentResults({ assessment }: AssessmentResultsProps) {
   return (
     <div className="flex flex-col min-h-screen relative">
       {/* Background Image with Gradient Overlay - same as landing page */}
@@ -41,7 +40,7 @@ export function AssessmentResults({ assessment, workoutPlan }: AssessmentResults
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-bold text-black">Your Assessment Results</h1>
           <p className="text-xl text-gray-600">
-            Here's a summary of your fitness profile
+            Here&apos;s a summary of your fitness profile
           </p>
         </div>
 
