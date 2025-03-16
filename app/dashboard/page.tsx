@@ -1,7 +1,7 @@
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
-import { DashboardContent } from "@/src/components/dashboard/dashboard-content"
+import { DashboardContent } from "@/app/components/dashboard/dashboard-content"
 import Image from 'next/image'
 
 export default async function DashboardPage() {
